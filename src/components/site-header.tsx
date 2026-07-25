@@ -27,7 +27,7 @@ function getMegaColumns(groups: MenuGroup[]) {
 }
 
 function Logo() {
-  return <Image alt="سرخاب فرنگی" className="h-auto w-[90px] md:w-[128px]" height={58} priority src="/img/logo.png" width={145} />;
+  return <Image alt="سرخاب فرنگی" className="h-auto w-[78px] md:w-[128px]" height={58} priority src="/img/logo.png" width={145} />;
 }
 
 function LipstickIcon() {
@@ -109,13 +109,13 @@ export function SiteHeader({ categories }: { categories: MenuCategory[] }) {
 
   return (
     <>
-      <header className="relative z-30 border-b border-[#f1e6ec] bg-[#fbf6fa]">
+      <header className="relative z-30 border-b-0 bg-transparent md:border-b md:border-[#f1e6ec] md:bg-[#fbf6fa]">
         <div className="mx-auto flex max-w-7xl items-center gap-4 px-5 py-3 md:h-28 md:py-0" dir="rtl">
           <div className="flex shrink-0 items-center gap-4">
             <button className="text-zinc-600 md:hidden" onClick={() => setDrawerOpen(true)} aria-label="باز کردن منو">
-              <span className="block h-0.5 w-6 bg-current" />
-              <span className="my-1.5 block h-0.5 w-6 bg-current" />
-              <span className="block h-0.5 w-6 bg-current" />
+              <span className="block h-0.5 w-5 bg-current" />
+              <span className="my-1 block h-0.5 w-5 bg-current" />
+              <span className="block h-0.5 w-5 bg-current" />
             </button>
             <Logo />
           </div>
@@ -129,8 +129,8 @@ export function SiteHeader({ categories }: { categories: MenuCategory[] }) {
             <UserRound size={27} strokeWidth={1.7} />
           </div>
           <div className="mr-auto flex items-center gap-4 text-zinc-600 md:hidden" dir="ltr">
-            <ShoppingCart size={23} strokeWidth={1.7} />
-            <UserRound size={23} strokeWidth={1.7} />
+            <ShoppingCart size={19} strokeWidth={1.7} />
+            <UserRound size={19} strokeWidth={1.7} />
           </div>
         </div>
         <nav className="hidden border-t border-white/70 bg-white/55 md:block">
@@ -141,16 +141,16 @@ export function SiteHeader({ categories }: { categories: MenuCategory[] }) {
                   <Star size={17} strokeWidth={1.8} /> {category.name} <ChevronDown className="transition-transform duration-200 ease-out group-hover:rotate-180" size={16} />
                 </button>
                 {category.groups.length > 0 && (
-                  <div className="invisible absolute top-full right-0 z-50 h-[500px] w-full overflow-hidden border border-[#f4dce9] bg-[#fff8fc] p-1 opacity-0 shadow-xl transition-all duration-150 group-hover:visible group-hover:opacity-100">
-                    <a className="flex items-center gap-1 px-7 py-5 text-base font-semibold text-[#fb65b6]" href="#">مشاهده همه محصولات {category.name} <ChevronLeft size={18} /></a>
-                    <div className="grid h-[calc(100%-60px)] grid-cols-5 items-stretch gap-1">
+                  <div className="invisible absolute top-full right-0 z-50 flex h-[500px] w-full flex-col overflow-hidden border border-[#f4dce9] bg-[#fff8fc] p-1 opacity-0 shadow-xl transition-all duration-150 group-hover:visible group-hover:opacity-100">
+                    <a className="flex shrink-0 items-center gap-1 px-7 py-5 text-base font-semibold text-[#fb65b6]" href="#">مشاهده همه محصولات {category.name} <ChevronLeft size={18} /></a>
+                    <div className="mb-4 grid min-h-0 flex-1 grid-cols-5 items-stretch gap-1">
                       {getMegaColumns(category.groups).map((column, index) => (
                         <div className="bg-white px-4 py-5" key={index}>
                           {column.map((group, groupIndex) => (
                             <section className={groupIndex > 0 ? "mt-6" : ""} key={group.id}>
                               <h3 className="relative mb-3 pr-3 text-sm font-bold text-zinc-600 before:absolute before:right-0 before:top-0.5 before:h-5 before:w-0.5 before:bg-[#97003b]">{group.name}</h3>
                               <ul className="space-y-2 text-xs leading-5 text-zinc-500">
-                                {group.items.map((item) => <li key={item.id}><a href="#" className="hover:text-[#97003b]">{item.name}</a></li>)}
+                                {group.items.map((item) => <li key={item.id}><a href="#" className="inline-block transition-transform duration-200 hover:-translate-x-1 hover:text-[#97003b]">{item.name}</a></li>)}
                               </ul>
                             </section>
                           ))}
