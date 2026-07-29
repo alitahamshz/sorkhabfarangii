@@ -39,7 +39,7 @@ export function SiteHeader({
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-30 border-b transition-colors duration-300 ${
+        className={`fixed inset-x-0 top-0 z-30 transition-colors duration-300 ${
           isSolid
             ? "border-zinc-100 bg-white"
             : "border-transparent bg-transparent"

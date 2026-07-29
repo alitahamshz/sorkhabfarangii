@@ -9,16 +9,16 @@ import {
   Zap,
 } from "lucide-react";
 
-const iconProps = {
-  className: "h-[18px] w-[18px] shrink-0 text-[#d81968]",
-  strokeWidth: 1.7,
+type CategoryIconProps = {
+  className?: string;
+  name: string;
 };
 
-function LipstickIcon() {
+function LipstickIcon({ className }: { className: string }) {
   return (
     <svg
       aria-hidden="true"
-      className={iconProps.className}
+      className={className}
       fill="none"
       viewBox="0 0 24 24"
     >
@@ -42,10 +42,15 @@ function LipstickIcon() {
   );
 }
 
-export function CategoryIcon({ name }: { name: string }) {
+export function CategoryIcon({
+  className = "size-[18px] shrink-0 text-[#d81968]",
+  name,
+}: CategoryIconProps) {
+  const iconProps = { className, strokeWidth: 1.7 };
+
   switch (name) {
     case "آرایشی":
-      return <LipstickIcon />;
+      return <LipstickIcon className={className} />;
     case "پوستی":
       return <Sparkles {...iconProps} />;
     case "بهداشتی":

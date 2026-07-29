@@ -1,6 +1,5 @@
 import { ChevronDown } from "lucide-react";
-import type { MenuCategory } from "@/features/categories";
-import { CategoryIcon } from "./category-icon";
+import { CategoryIcon, type MenuCategory } from "@/features/categories";
 import { MobileMenuGroup } from "./mobile-menu-group";
 
 type MobileMenuCategoryProps = {

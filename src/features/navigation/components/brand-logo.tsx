@@ -4,7 +4,7 @@ export function BrandLogo() {
   return (
     <Image
       alt="سرخاب فرنگی"
-      className="h-auto w-[78px] md:w-[128px]"
+      className="h-auto w-[70px] md:w-[120px]"
       height={58}
       priority
       src="/img/logo.svg"
@@ -12,3 +12,5 @@ export function BrandLogo() {
     />
   );
 }
+
+               
