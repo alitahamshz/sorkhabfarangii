@@ -13,6 +13,7 @@ export function SiteHeader({
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSolid, setIsSolid] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(true);
   const headerRef = useRef<HTMLElement>(null);
   const closeMenu = useCallback(() => setIsMenuOpen(false), []);
 
@@ -21,6 +22,7 @@ export function SiteHeader({
       const slider = document.querySelector<HTMLElement>("[data-home-slider]");
       const headerHeight = headerRef.current?.offsetHeight ?? 0;
 
+      setIsAtTop(window.scrollY === 0);
       setIsSolid(
         slider ? slider.getBoundingClientRect().bottom <= headerHeight : false,
       );
@@ -46,7 +48,7 @@ export function SiteHeader({
         }`}
         ref={headerRef}
       >
-        <HeaderTopBar onOpenMenu={() => setIsMenuOpen(true)} />
+        <HeaderTopBar isAtTop={isAtTop} onOpenMenu={() => setIsMenuOpen(true)} />
         <DesktopNavigation categories={categories} isSolid={isSolid} />
       </header>
       <MobileMenuDrawer

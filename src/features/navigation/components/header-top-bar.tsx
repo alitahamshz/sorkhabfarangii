@@ -3,6 +3,7 @@ import { Search } from "lucide-react";
 import { BrandLogo } from "./brand-logo";
 
 type HeaderTopBarProps = {
+  isAtTop: boolean;
   onOpenMenu: () => void;
 };
 
@@ -23,10 +24,12 @@ function AccountActions({ mobile = false }: { mobile?: boolean }) {
   );
 }
 
-export function HeaderTopBar({ onOpenMenu }: HeaderTopBarProps) {
+export function HeaderTopBar({ isAtTop, onOpenMenu }: HeaderTopBarProps) {
   return (
     <div
-      className="mx-auto pt-8 flex max-w-7xl items-center gap-4 px-4 py-2 md:h-28 md:py-0"
+      className={`mx-auto flex max-w-7xl items-center gap-4 px-4 py-2 transition-[padding] duration-300 md:h-28 md:py-0 ${
+        isAtTop ? "pt-6" : "pt-2"
+      }`}
       dir="rtl"
     >
       <div className="flex shrink-0 items-center gap-3 md:hidden">
