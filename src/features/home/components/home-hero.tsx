@@ -14,6 +14,11 @@ const SLIDES = [
     background: "bg-[#efc4a7]",
     src: "/img/banner2.webp",
   },
+  {
+    alt: "محصولات آرایش صورت شگلم",
+    background: "bg-[#efc4a7]",
+    src: "/img/banner3.webp",
+  },
 ];
 
 export function HomeHero() {
