@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 const BANNERS = ["/img/menuBanner1.png", "/img/menuBanner2.png"];
 
@@ -35,14 +36,16 @@ export function PromoBanner() {
 
       <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1.5">
         {BANNERS.map((src, index) => (
-          <button
+          <Button
             aria-label={`نمایش بنر ${index + 1}`}
             className={`h-1.5 rounded-full transition-all ${
               activeBanner === index ? "w-4 bg-white" : "w-1.5 bg-white/60"
             }`}
             key={src}
             onClick={() => setActiveBanner(index)}
+            size="icon-xs"
             type="button"
+            variant="ghost"
           />
         ))}
       </div>

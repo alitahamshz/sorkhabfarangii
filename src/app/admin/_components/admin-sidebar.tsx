@@ -16,6 +16,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 type SidebarItem = {
   id: string;
@@ -57,7 +58,7 @@ export function AdminSidebar({
   return (
     <aside
       aria-label="منوی داشبورد ادمین"
-      className={`fixed inset-y-0 right-0 z-40 flex w-[313px] max-w-[88vw] flex-col rounded-l-2xl bg-[#85002e] px-6 pb-5 pt-6 text-white shadow-xl transition-transform duration-300 lg:translate-x-0 ${
+      className={`fixed inset-y-0 right-0 z-40 flex w-[313px] max-w-[88vw] flex-col rounded-l-2xl bg-primary-500 px-6 pb-5 pt-6 text-white shadow-xl transition-transform duration-300 lg:translate-x-0 ${
         isOpen ? "translate-x-0" : "translate-x-full"
       }`}
     >
@@ -75,14 +76,15 @@ export function AdminSidebar({
       <div className="h-px shrink-0 bg-white/65" />
 
       <nav className="mt-6 min-h-0 flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <button
+        <Button
           className="flex h-11 w-full cursor-pointer items-center gap-3 px-3 text-right text-base font-semibold"
           onClick={onClose}
           type="button"
+          variant="ghost"
         >
           <Presentation size={23} strokeWidth={1.6} />
           <span>نمای کلی</span>
-        </button>
+        </Button>
 
         <div className="mt-4 space-y-3">
           {sidebarItems.map((item) => {
@@ -91,15 +93,16 @@ export function AdminSidebar({
 
             return (
               <div key={item.id}>
-                <button
+                <Button
                   aria-expanded={isExpanded}
                   className={`flex h-[47px] w-full cursor-pointer items-center rounded-xl px-3 text-right transition-colors ${
                     isExpanded
-                      ? "bg-[#f8edf1] text-zinc-900 shadow-[0_8px_14px_rgba(0,0,0,0.2)]"
+                      ? "bg-primary-50 text-zinc-900 shadow-[0_8px_14px_rgba(0,0,0,0.2)]"
                       : "text-white hover:bg-white/10"
                   }`}
                   onClick={() => setExpandedItem(isExpanded ? null : item.id)}
                   type="button"
+                  variant="ghost"
                 >
                   <Icon size={23} strokeWidth={1.55} />
                   <span className="mr-3 flex-1 text-[15px] font-bold">{item.label}</span>
@@ -108,19 +111,20 @@ export function AdminSidebar({
                   ) : (
                     <ChevronDown size={22} strokeWidth={1.5} />
                   )}
-                </button>
+                </Button>
 
                 {isExpanded && item.children ? (
                   <div className="mx-2 mt-5 rounded-xl bg-white px-5 py-2 text-zinc-800 shadow-sm">
                     {item.children.map((child) => (
-                      <button
-                        className="block h-[44px] w-full cursor-pointer text-right text-[13px] transition-colors hover:text-[#85002e]"
+                      <Button
+                        className="block h-[44px] w-full cursor-pointer text-right text-[13px] transition-colors hover:text-primary-500"
                         key={child}
                         onClick={onClose}
                         type="button"
+                        variant="ghost"
                       >
                         {child}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 ) : null}
@@ -137,12 +141,11 @@ export function AdminSidebar({
             <p className="truncate text-sm font-medium">مدیر ارشد</p>
             <p className="mt-0.5 text-[9px] text-white/70" dir="ltr">0912 123 1214</p>
           </div>
-          <button aria-label="خروج از حساب" className="cursor-pointer text-white/90 hover:text-white" type="button">
+          <Button aria-label="خروج از حساب" className="cursor-pointer text-white/90 hover:text-white" size="icon" type="button" variant="ghost">
             <LogOut size={22} strokeWidth={1.5} />
-          </button>
+          </Button>
         </div>
       </footer>
     </aside>
   );
 }
-

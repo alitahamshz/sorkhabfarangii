@@ -1,7 +1,14 @@
 "use client";
 
 import { X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import type { MenuCategory } from "@/features/categories";
 import { BrandLogo } from "./brand-logo";
 import { MobileMenuCategory } from "./mobile-menu-category";
@@ -23,48 +30,31 @@ export function MobileMenuDrawer({
   );
   const [openGroupId, setOpenGroupId] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [isOpen, onClose]);
-
   return (
-    <div
-      aria-hidden={!isOpen}
-      className="pointer-events-none fixed inset-0 z-50"
+    <Sheet
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+      open={isOpen}
     >
-      <button
-        aria-label="بستن منو"
-        className={`absolute inset-0 bg-black/30 transition-opacity duration-300 ${
-          isOpen
-            ? "pointer-events-auto opacity-100"
-            : "pointer-events-none opacity-0"
-        }`}
-        onClick={onClose}
-        type="button"
-      />
-
-      <aside
+      <SheetContent
         aria-label="منوی موبایل"
-        className={`absolute right-0 top-0 h-full w-[70vw] overflow-y-auto rounded-l-lg bg-white shadow-2xl transition-transform duration-300 ease-out ${
-          isOpen
-            ? "pointer-events-auto translate-x-0"
-            : "pointer-events-none translate-x-full"
-        }`}
+        className="w-[70vw] max-w-none gap-0 overflow-y-auto rounded-l-lg border-0 bg-white p-0 shadow-2xl sm:max-w-none"
+        showCloseButton={false}
+        side="right"
       >
+        <SheetTitle className="sr-only">منوی موبایل</SheetTitle>
         <div
           className="flex h-25 items-center justify-start gap-5 border-b border-zinc-100 px-7"
           dir="rtl"
         >
-          <button aria-label="بستن منو" onClick={onClose} type="button">
+          <SheetClose
+            render={
+              <Button aria-label="بستن منو" size="icon-lg" type="button" variant="ghost" />
+            }
+          >
             <X className="text-zinc-500" size={34} strokeWidth={1.5} />
-          </button>
+          </SheetClose>
           <BrandLogo />
         </div>
 
@@ -90,7 +80,7 @@ export function MobileMenuDrawer({
             />
           ))}
         </div>
-      </aside>
-    </div>
+      </SheetContent>
+    </Sheet>
   );
 }

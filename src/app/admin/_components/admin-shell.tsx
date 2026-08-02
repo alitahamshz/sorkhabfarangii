@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { AdminHeader } from "./admin-header";
 import { AdminSidebar } from "./admin-sidebar";
 
@@ -15,11 +16,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       />
 
       {isMobileSidebarOpen ? (
-        <button
+        <Button
           aria-label="بستن منوی مدیریت"
-          className="fixed inset-0 z-30 cursor-default bg-black/35 lg:hidden"
+          className="fixed inset-0 z-30 h-auto w-auto cursor-default rounded-none bg-black/35 p-0 lg:hidden"
           onClick={() => setIsMobileSidebarOpen(false)}
           type="button"
+          variant="ghost"
         />
       ) : null}
 

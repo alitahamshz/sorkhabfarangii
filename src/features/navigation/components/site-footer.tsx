@@ -2,7 +2,9 @@
 
 import { ChevronDown, MessageCircle, Music2, Send } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 const FOOTER_LINKS = [
   { title: "خدمات مشتریان", links: ["پاسخ به پرسش‌های متداول", "رویه بازگرداندن کالا"] },
@@ -23,14 +25,14 @@ export function SiteFooter() {
           <div className="h-px flex-1 bg-zinc-300" />
           <div className="flex gap-1.5">
             {SOCIAL_LINKS.map((Icon, index) => (
-              <a
+              <Link
                 aria-label={`شبکه اجتماعی ${index + 1}`}
-                className="grid size-8 place-items-center rounded-lg bg-zinc-100 text-[#85002f] transition-transform hover:-translate-y-0.5 sm:size-10"
+                className="grid size-8 place-items-center rounded-lg bg-zinc-100 text-primary-500 transition-transform hover:-translate-y-0.5 sm:size-10"
                 href="#"
                 key={index}
               >
                 <Icon size={16} />
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -40,15 +42,16 @@ export function SiteFooter() {
             const isOpen = openItem === item.title;
             return (
               <div key={item.title}>
-                <button
+                <Button
                   aria-expanded={isOpen}
-                  className="flex w-full items-center justify-between py-3 text-sm font-semibold"
+                  className="flex h-auto w-full items-center justify-between px-0 py-3 text-sm font-semibold"
                   onClick={() => setOpenItem(isOpen ? null : item.title)}
                   type="button"
+                  variant="ghost"
                 >
                   <span>{item.title}</span>
                   <ChevronDown className={`transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} size={18} />
-                </button>
+                </Button>
                 <div
                   className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${
                     isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
@@ -56,7 +59,7 @@ export function SiteFooter() {
                 >
                   <div className="min-h-0 overflow-hidden">
                     <ul className={`space-y-2 pb-3 text-xs text-zinc-500 transition-opacity duration-200 ${isOpen ? "opacity-100" : "opacity-0"}`}>
-                      {item.links.map((link) => <li key={link}><a href="#">{link}</a></li>)}
+                      {item.links.map((link) => <li key={link}><Link href="#">{link}</Link></li>)}
                     </ul>
                   </div>
                 </div>

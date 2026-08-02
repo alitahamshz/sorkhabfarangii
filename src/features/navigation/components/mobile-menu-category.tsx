@@ -1,4 +1,5 @@
 import { ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { CategoryIcon, type MenuCategory } from "@/features/categories";
 import { MobileMenuGroup } from "./mobile-menu-group";
 
@@ -19,24 +20,25 @@ export function MobileMenuCategory({
 }: MobileMenuCategoryProps) {
   return (
     <section className="border-b border-zinc-100 pb-3">
-      <button
+      <Button
         aria-expanded={isOpen}
-        className="flex w-full items-center justify-between py-0.5 text-base font-bold text-zinc-500"
+        className="flex h-auto w-full items-center justify-between px-0 py-0.5 text-base font-bold text-zinc-500"
         onClick={onToggle}
         type="button"
+        variant="ghost"
       >
         <span className="flex items-center gap-2">
           <CategoryIcon name={category.name} />
           {category.name}
         </span>
         <ChevronDown
-          className={`text-[#97003b] transition-transform duration-300 ${
+          className={`text-primary-500 transition-transform duration-300 ${
             isOpen ? "rotate-180" : ""
           }`}
           size={20}
           strokeWidth={1.7}
         />
-      </button>
+      </Button>
 
       <div
         className={`grid transition-[grid-template-rows] duration-300 ease-out ${
@@ -44,7 +46,7 @@ export function MobileMenuCategory({
         }`}
       >
         <div className="overflow-hidden">
-          <ul className="rounded-2xl bg-[#fafafa] px-4 py-2 text-sm text-slate-500">
+          <ul className="rounded-2xl bg-neutral-50 px-4 py-2 text-sm text-slate-500">
             {category.groups.map((group) => (
               <MobileMenuGroup
                 group={group}

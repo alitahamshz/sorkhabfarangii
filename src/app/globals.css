@@ -1,11 +1,152 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource/vazirmatn/400.css";
-@import "@fontsource/vazirmatn/500.css";
-@import "@fontsource/vazirmatn/600.css";
-@import "@fontsource/vazirmatn/700.css";
-@import "@fontsource/vazirmatn/900.css";
+
+/* Peyda Standard: مناسب متن انگلیسی، ایمیل، شناسه و اعداد لاتین */
+@font-face {
+  font-family: "Peyda";
+  src: url("/font/Standard/WebFonts/fonts/woff2/PeydaWeb-Thin.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Peyda";
+  src: url("/font/Standard/WebFonts/fonts/woff2/PeydaWeb-ExtraLight.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Peyda";
+  src: url("/font/Standard/WebFonts/fonts/woff2/PeydaWeb-Light.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Peyda";
+  src: url("/font/Standard/WebFonts/fonts/woff2/PeydaWeb-Regular.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Peyda";
+  src: url("/font/Standard/WebFonts/fonts/woff2/PeydaWeb-Medium.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Peyda";
+  src: url("/font/Standard/WebFonts/fonts/woff2/PeydaWeb-SemiBold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Peyda";
+  src: url("/font/Standard/WebFonts/fonts/woff2/PeydaWeb-Bold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Peyda";
+  src: url("/font/Standard/WebFonts/fonts/woff2/PeydaWeb-ExtraBold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Peyda";
+  src: url("/font/Standard/WebFonts/fonts/woff2/PeydaWeb-Black.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+}
+
+/* Peyda Farsi Numerals: اعداد 0-9 را با ظاهر فارسی نمایش می‌دهد */
+@font-face {
+  font-family: "PeydaFaNum";
+  src: url("/font/Farsi_Namerals/WebFonts/fonts/woff2/PeydaWebFaNum-Thin.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PeydaFaNum";
+  src: url("/font/Farsi_Namerals/WebFonts/fonts/woff2/PeydaWebFaNum-ExtraLight.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PeydaFaNum";
+  src: url("/font/Farsi_Namerals/WebFonts/fonts/woff2/PeydaWebFaNum-Light.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PeydaFaNum";
+  src: url("/font/Farsi_Namerals/WebFonts/fonts/woff2/PeydaWebFaNum-Regular.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PeydaFaNum";
+  src: url("/font/Farsi_Namerals/WebFonts/fonts/woff2/PeydaWebFaNum-Medium.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PeydaFaNum";
+  src: url("/font/Farsi_Namerals/WebFonts/fonts/woff2/PeydaWebFaNum-SemiBold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PeydaFaNum";
+  src: url("/font/Farsi_Namerals/WebFonts/fonts/woff2/PeydaWebFaNum-Bold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PeydaFaNum";
+  src: url("/font/Farsi_Namerals/WebFonts/fonts/woff2/PeydaWebFaNum-ExtraBold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PeydaFaNum";
+  src: url("/font/Farsi_Namerals/WebFonts/fonts/woff2/PeydaWebFaNum-Black.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+}
 
 @custom-variant dark (&:is(.dark *));
 
@@ -15,12 +156,110 @@
 
 body {
   margin: 0;
-  font-family: "Vazirmatn", Tahoma, Arial, sans-serif;
+  font-family: "PeydaFaNum", "Peyda", Tahoma, Arial, sans-serif;
 }
 
 @theme inline {
-  --font-heading: "Vazirmatn", Tahoma, Arial, sans-serif;
-  --font-sans: "Vazirmatn", Tahoma, Arial, sans-serif;
+  --font-heading: "PeydaFaNum", "Peyda", Tahoma, Arial, sans-serif;
+  --font-sans: "PeydaFaNum", "Peyda", Tahoma, Arial, sans-serif;
+  --font-standard: "Peyda", Tahoma, Arial, sans-serif;
+  --font-fa-num: "PeydaFaNum", "Peyda", Tahoma, Arial, sans-serif;
+  --color-primary-50: #f1e6e9;
+  --color-primary-100: #d3b0bc;
+  --color-primary-200: #be8a9b;
+  --color-primary-300: #a0546e;
+  --color-primary-400: #8d3351;
+  --color-primary-500: #710026;
+  --color-primary-600: #670023;
+  --color-primary-700: #50001b;
+  --color-primary-800: #3e0015;
+  --color-primary-900: #2f0010;
+  --color-secondary-50: #fff1fa;
+  --color-secondary-100: #ffd4ee;
+  --color-secondary-200: #ffc0e6;
+  --color-secondary-300: #ffa3da;
+  --color-secondary-400: #ff91d3;
+  --color-secondary-500: #ff75c8;
+  --color-secondary-600: #e86ab6;
+  --color-secondary-700: #b5538e;
+  --color-secondary-800: #8c406e;
+  --color-secondary-900: #6b3154;
+  --color-neutral-50: #f9fafb;
+  --color-neutral-100: #f3f4f6;
+  --color-neutral-200: #e5e7eb;
+  --color-neutral-300: #d1d5db;
+  --color-neutral-400: #9ca3af;
+  --color-neutral-500: #6b7280;
+  --color-neutral-600: #4b5563;
+  --color-neutral-700: #374151;
+  --color-neutral-800: #1f2a37;
+  --color-neutral-900: #111928;
+  --color-zinc-50: #f9fafb;
+  --color-zinc-100: #f3f4f6;
+  --color-zinc-200: #e5e7eb;
+  --color-zinc-300: #d1d5db;
+  --color-zinc-400: #9ca3af;
+  --color-zinc-500: #6b7280;
+  --color-zinc-600: #4b5563;
+  --color-zinc-700: #374151;
+  --color-zinc-800: #1f2a37;
+  --color-zinc-900: #111928;
+  --color-blue-50: #ebf5ff;
+  --color-blue-100: #e1effe;
+  --color-blue-200: #c3ddfd;
+  --color-blue-300: #a4cafe;
+  --color-blue-400: #76a9fa;
+  --color-blue-500: #3f83f8;
+  --color-blue-600: #1c64f2;
+  --color-blue-700: #1a56db;
+  --color-blue-800: #1e429f;
+  --color-blue-900: #233876;
+  --color-red-50: #fdf2f2;
+  --color-red-100: #fde8e8;
+  --color-red-200: #fbd5d5;
+  --color-red-300: #f8b4b4;
+  --color-red-400: #f98080;
+  --color-red-500: #f05252;
+  --color-red-600: #e02424;
+  --color-red-700: #c81e1e;
+  --color-red-800: #9b1c1c;
+  --color-red-900: #771d1d;
+  --color-orange-50: #fff8f1;
+  --color-orange-100: #feecdc;
+  --color-orange-200: #fcd9bd;
+  --color-orange-300: #fdba8c;
+  --color-orange-400: #ff8a4c;
+  --color-orange-500: #ff5a1f;
+  --color-orange-600: #d03801;
+  --color-orange-700: #b43403;
+  --color-orange-800: #8a2c0d;
+  --color-orange-900: #771d1d;
+  --color-yellow-50: #fdfdea;
+  --color-yellow-100: #fdf6b2;
+  --color-yellow-200: #fce96a;
+  --color-yellow-300: #faca15;
+  --color-yellow-400: #e3a008;
+  --color-yellow-500: #c27803;
+  --color-yellow-600: #9f580a;
+  --color-yellow-700: #8e4b10;
+  --color-yellow-800: #723b13;
+  --color-yellow-900: #633112;
+  --color-green-50: #f3faf7;
+  --color-green-100: #def7ec;
+  --color-green-200: #bcf0da;
+  --color-green-300: #84e1bc;
+  --color-green-400: #31c48d;
+  --color-green-500: #0e9f6e;
+  --color-green-600: #057a55;
+  --color-green-700: #046c4e;
+  --color-green-800: #03543f;
+  --color-green-900: #014737;
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -62,72 +301,84 @@ body {
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --background: #f9fafb;
+  --foreground: #111928;
+  --card: #ffffff;
+  --card-foreground: #111928;
+  --popover: #ffffff;
+  --popover-foreground: #111928;
+  --primary: #710026;
+  --primary-foreground: #ffffff;
+  --secondary: #ff75c8;
+  --secondary-foreground: #2f0010;
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  --accent: #fff1fa;
+  --accent-foreground: #710026;
+  --destructive: #e02424;
+  --info: #3f83f8;
+  --info-foreground: #111928;
+  --success: #0e9f6e;
+  --success-foreground: #111928;
+  --warning: #c27803;
+  --warning-foreground: #111928;
+  --border: #e5e7eb;
+  --input: #d1d5db;
+  --ring: #710026;
+  --chart-1: #710026;
+  --chart-2: #ff75c8;
+  --chart-3: #3f83f8;
+  --chart-4: #ff5a1f;
+  --chart-5: #0e9f6e;
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: #ffffff;
+  --sidebar-foreground: #111928;
+  --sidebar-primary: #710026;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #fff1fa;
+  --sidebar-accent-foreground: #710026;
+  --sidebar-border: #e5e7eb;
+  --sidebar-ring: #710026;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #111928;
+  --foreground: #f9fafb;
+  --card: #1f2a37;
+  --card-foreground: #f9fafb;
+  --popover: #1f2a37;
+  --popover-foreground: #f9fafb;
+  --primary: #710026;
+  --primary-foreground: #ffffff;
+  --secondary: #ff75c8;
+  --secondary-foreground: #2f0010;
+  --muted: #374151;
+  --muted-foreground: #d1d5db;
+  --accent: #50001b;
+  --accent-foreground: #fff1fa;
+  --destructive: #f05252;
+  --info: #76a9fa;
+  --info-foreground: #111928;
+  --success: #31c48d;
+  --success-foreground: #111928;
+  --warning: #faca15;
+  --warning-foreground: #111928;
+  --border: rgb(249 250 251 / 14%);
+  --input: rgb(249 250 251 / 18%);
+  --ring: #ff75c8;
+  --chart-1: #a0546e;
+  --chart-2: #ff91d3;
+  --chart-3: #76a9fa;
+  --chart-4: #ff8a4c;
+  --chart-5: #31c48d;
+  --sidebar: #1f2a37;
+  --sidebar-foreground: #f9fafb;
+  --sidebar-primary: #710026;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #50001b;
+  --sidebar-accent-foreground: #fff1fa;
+  --sidebar-border: rgb(249 250 251 / 14%);
+  --sidebar-ring: #ff75c8;
 }
 
 @layer base {

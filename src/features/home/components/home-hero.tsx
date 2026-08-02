@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 const SLIDES = [
   {
@@ -92,7 +93,7 @@ export function HomeHero() {
           {SLIDES.map((_, index) => {
             const isActive = activeSlide === index;
             return (
-              <button
+              <Button
                 aria-label={`نمایش اسلاید ${index + 1}`}
                 aria-current={isActive}
                 className={`rounded-full transition-all duration-100 ${
@@ -102,7 +103,9 @@ export function HomeHero() {
                 }`}
                 key={index}
                 onClick={() => setActiveSlide(index)}
+                size="icon-xs"
                 type="button"
+                variant="ghost"
               />
             );
           })}

@@ -10,7 +10,13 @@ import {
   ShoppingBag,
   WalletCards,
 } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { BrandLogo } from "./brand-logo";
 
 type HeaderTopBarProps = {
@@ -19,33 +25,6 @@ type HeaderTopBarProps = {
 };
 
 function AccountActions({ mobile = false }: { mobile?: boolean }) {
-  // وضعیت باز یا بسته بودن منوی حساب کاربری
-  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
-  const accountMenuId = useId();
-  const accountMenuRef = useRef<HTMLDivElement>(null);
-
-  // بستن منو با کلیک بیرون از آن یا فشردن کلید Escape
-  useEffect(() => {
-    if (!isAccountMenuOpen) return;
-
-    const closeOnOutsideClick = (event: PointerEvent) => {
-      if (!accountMenuRef.current?.contains(event.target as Node)) {
-        setIsAccountMenuOpen(false);
-      }
-    };
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsAccountMenuOpen(false);
-    };
-
-    document.addEventListener("pointerdown", closeOnOutsideClick);
-    document.addEventListener("keydown", closeOnEscape);
-
-    return () => {
-      document.removeEventListener("pointerdown", closeOnOutsideClick);
-      document.removeEventListener("keydown", closeOnEscape);
-    };
-  }, [isAccountMenuOpen]);
-
   return (
     <div
       className={
@@ -55,98 +34,59 @@ function AccountActions({ mobile = false }: { mobile?: boolean }) {
       }
       dir="rtl"
     >
-      {/* دکمه آیکون کاربر و منوی بازشونده آن */}
-      <div className="relative" ref={accountMenuRef}>
-        {/* دکمه باز و بسته کردن منوی حساب کاربری */}
-        <button
-          aria-controls={accountMenuId}
-          aria-expanded={isAccountMenuOpen}
-          aria-label="باز کردن منوی حساب کاربری"
-          className="flex cursor-pointer items-center justify-center rounded-full transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-4"
-          onClick={() => setIsAccountMenuOpen((isOpen) => !isOpen)}
-          type="button"
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button
+              aria-label="باز کردن منوی حساب کاربری"
+              className="rounded-full transition-opacity hover:opacity-70"
+              size="icon"
+              type="button"
+              variant="ghost"
+            />
+          }
         >
           <Image alt="" aria-hidden height={24} src="/icon/header/user.png" width={24} />
-        </button>
-
-        {isAccountMenuOpen ? (
-          /* پنل منوی حساب کاربری */
-          <div
-            aria-label="منوی حساب کاربری"
-            className="absolute left-1/2 top-[calc(100%+14px)] z-50 w-44 -translate-x-1/2 rounded-md border border-zinc-300 bg-white px-2 text-[13px] text-zinc-500 shadow-none"
-            id={accountMenuId}
-            role="menu"
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="center"
+          aria-label="منوی حساب کاربری"
+          className="w-44 rounded-md border-zinc-300 px-2 text-[13px] text-zinc-500 shadow-none"
+          sideOffset={14}
+        >
+          <DropdownMenuItem
+            className="h-10 justify-between rounded-none border-b border-zinc-200"
+            render={<Link href="/account" />}
           >
-            {/* مثلث دقیقاً وسط پنل و آیکون کاربر؛ فقط اضلاع بیرونی آن بوردر دارند */}
-            <span
-              aria-hidden
-              className="absolute -top-2 left-1/2 z-10 size-4 -translate-x-1/2 rotate-45 border-l border-t border-zinc-300 bg-white"
-            />
-
-            {/* نام کاربر و لینک ورود به صفحه حساب */}
-            <Link
-              className="relative flex h-10 w-full cursor-pointer items-center justify-between border-b border-zinc-200 text-right transition-colors hover:text-zinc-900"
-              href="/account"
-              role="menuitem"
-            >
-              <span>نام کاربر</span>
-              <ChevronLeft aria-hidden size={16} strokeWidth={1.5} />
-            </Link>
-
-            {/* گزینه‌های حساب کاربری */}
-            <button
-              className="flex h-10 w-full cursor-pointer items-center gap-2 border-b border-zinc-200 text-right transition-colors hover:text-zinc-900"
-              role="menuitem"
-              type="button"
-            >
-              <ShoppingBag aria-hidden size={17} strokeWidth={1.4} />
-              <span>سفارش‌های من</span>
-            </button>
-            <button
-              className="flex h-10 w-full cursor-pointer items-center gap-2 border-b border-zinc-200 text-right transition-colors hover:text-zinc-900"
-              role="menuitem"
-              type="button"
-            >
-              <Heart aria-hidden size={17} strokeWidth={1.4} />
-              <span>علاقه‌مندی‌ها</span>
-            </button>
-            <button
-              className="flex h-10 w-full cursor-pointer items-center gap-2 border-b border-zinc-200 text-right transition-colors hover:text-zinc-900"
-              role="menuitem"
-              type="button"
-            >
-              <MapPin aria-hidden size={17} strokeWidth={1.4} />
-              <span>آدرس‌های من</span>
-            </button>
-            <button
-              className="flex h-10 w-full cursor-pointer items-center gap-2 border-b border-zinc-200 text-right transition-colors hover:text-zinc-900"
-              role="menuitem"
-              type="button"
-            >
-              <WalletCards aria-hidden size={17} strokeWidth={1.4} />
-              <span>کیف پول</span>
-            </button>
-            <button
-              className="flex h-10 w-full cursor-pointer items-center gap-2 border-b border-zinc-200 text-right transition-colors hover:text-zinc-900"
-              role="menuitem"
-              type="button"
-            >
-              <Headphones aria-hidden size={17} strokeWidth={1.4} />
-              <span>پشتیبانی</span>
-            </button>
-
-            {/* خروج از حساب کاربری */}
-            <button
-              className="flex h-10 w-full cursor-pointer items-center gap-2 text-right text-red-500 transition-colors hover:text-red-700"
-              role="menuitem"
-              type="button"
-            >
-              <LogOut aria-hidden size={17} strokeWidth={1.5} />
-              <span>خروج از حساب کاربری</span>
-            </button>
-          </div>
-        ) : null}
-      </div>
+            <span>نام کاربر</span>
+            <ChevronLeft aria-hidden size={16} strokeWidth={1.5} />
+          </DropdownMenuItem>
+          <DropdownMenuItem className="h-10 rounded-none border-b border-zinc-200">
+            <ShoppingBag aria-hidden size={17} strokeWidth={1.4} />
+            <span>سفارش‌های من</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="h-10 rounded-none border-b border-zinc-200">
+            <Heart aria-hidden size={17} strokeWidth={1.4} />
+            <span>علاقه‌مندی‌ها</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="h-10 rounded-none border-b border-zinc-200">
+            <MapPin aria-hidden size={17} strokeWidth={1.4} />
+            <span>آدرس‌های من</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="h-10 rounded-none border-b border-zinc-200">
+            <WalletCards aria-hidden size={17} strokeWidth={1.4} />
+            <span>کیف پول</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="h-10 rounded-none border-b border-zinc-200">
+            <Headphones aria-hidden size={17} strokeWidth={1.4} />
+            <span>پشتیبانی</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="h-10 rounded-none text-red-500" variant="destructive">
+            <LogOut aria-hidden size={17} strokeWidth={1.5} />
+            <span>خروج از حساب کاربری</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       {/* آیکون سبد خرید */}
       <Image alt="سبد خرید" width={24} height={24} src="/icon/header/cart.png" />
@@ -162,17 +102,19 @@ export function HeaderTopBar({ isAtTop, onOpenMenu }: HeaderTopBarProps) {
       dir="rtl"
     >
       <div className="flex shrink-0 items-center gap-3 md:hidden">
-        <button
+        <Button
           aria-label="باز کردن منو"
           className="text-zinc-600 md:hidden"
           onClick={onOpenMenu}
+          size="icon"
           type="button"
+          variant="ghost"
         >
           <Image alt="منو" height={24} src="/icon/header/menu.svg" width={24} />
-        </button>
-        <button aria-label="جستجو" className="text-zinc-600" type="button">
+        </Button>
+        <Button aria-label="جستجو" className="text-zinc-600" size="icon" type="button" variant="ghost">
           <Image alt="" aria-hidden height={24} src="/icon/header/search.svg" width={24} />
-        </button>
+        </Button>
       </div>
 
       <div className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0">

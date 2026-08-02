@@ -1,4 +1,5 @@
 import { ChevronDown, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import type { MenuCategory } from "@/features/categories";
 import { MegaMenu } from "./mega-menu";
 
@@ -22,11 +23,12 @@ export function DesktopNavigation({
       >
         {categories.map((category, index) => (
           <li className="group flex h-full items-center" key={category.id}>
-            <button
-              className={`flex items-center gap-1 whitespace-nowrap transition-colors group-hover:text-[#fb65b6] ${
-                index === 0 ? "text-[#fb65b6]" : ""
+            <Button
+              className={`flex h-auto items-center gap-1 whitespace-nowrap p-0 transition-colors group-hover:text-secondary-500 ${
+                index === 0 ? "text-secondary-500" : ""
               }`}
               type="button"
+              variant="ghost"
             >
               <Star size={17} strokeWidth={1.8} />
               {category.name}
@@ -34,7 +36,7 @@ export function DesktopNavigation({
                 className="transition-transform duration-200 ease-out group-hover:rotate-180"
                 size={16}
               />
-            </button>
+            </Button>
             {category.groups.length > 0 && <MegaMenu category={category} />}
           </li>
         ))}

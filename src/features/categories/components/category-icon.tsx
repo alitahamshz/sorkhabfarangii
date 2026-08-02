@@ -43,7 +43,7 @@ function LipstickIcon({ className }: { className: string }) {
 }
 
 export function CategoryIcon({
-  className = "size-[18px] shrink-0 text-[#d81968]",
+  className = "size-[18px] shrink-0 text-secondary-700",
   name,
 }: CategoryIconProps) {
   const iconProps = { className, strokeWidth: 1.7 };

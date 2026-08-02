@@ -2,7 +2,9 @@
 
 import { Heart } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 const PRODUCTS = [
   { id: "dove-1", discount: "۲۵٪", price: "۳۵۱,۱۰۰ تومان" },
@@ -32,23 +34,23 @@ const SHELF_STYLES: Record<
   { section: string; title: string; viewAll: string; tab: string; activeTab: string }
 > = {
   wine: {
-    section: "bg-[#85002f]",
+    section: "bg-primary-500",
     title: "text-white",
     viewAll: "text-white/90 hover:text-white",
     tab: "bg-white/20 text-white hover:bg-white/30",
-    activeTab: "bg-white text-[#85002f]",
+    activeTab: "bg-white text-primary-500",
   },
   rose: {
-    section: "bg-[#fff1f7]",
+    section: "bg-secondary-50",
     title: "text-zinc-700",
-    viewAll: "text-[#d81968] hover:text-[#97003b]",
-    tab: "bg-white text-zinc-600 hover:bg-[#fff7fb]",
-    activeTab: "bg-[#d81968] text-white",
+    viewAll: "text-secondary-700 hover:text-primary-500",
+    tab: "bg-white text-zinc-600 hover:bg-secondary-50",
+    activeTab: "bg-secondary-500 text-secondary-foreground",
   },
   plain: {
     section: "bg-white",
     title: "text-zinc-700",
-    viewAll: "text-[#d81968] hover:text-[#97003b]",
+    viewAll: "text-secondary-700 hover:text-primary-500",
     tab: "bg-zinc-100 text-zinc-600 hover:bg-zinc-200",
     activeTab: "bg-zinc-700 text-white",
   },
@@ -58,13 +60,15 @@ function ProductImage() {
   return (
     <div className="relative aspect-square overflow-hidden rounded-sm bg-[#f8f0d7]">
       <Image alt="مایع دستشویی داو" height={386} src="/img/product.png" width={360} />
-      <button
+      <Button
         aria-label="افزودن به علاقه‌مندی‌ها"
         className="absolute left-2 top-2 grid size-8 place-items-center rounded-full bg-white/90 text-zinc-500"
+        size="icon"
         type="button"
+        variant="ghost"
       >
         <Heart size={18} strokeWidth={1.5} />
-      </button>
+      </Button>
     </div>
   );
 }
@@ -79,13 +83,13 @@ function ProductCard({ discount, price }: { discount: string; price: string }) {
           مایع دستشویی خوشبو داو
         </h3>
         <div className="mt-4 flex items-end justify-between gap-2">
-          <button aria-label="افزودن مایع دستشویی داو به سبد خرید" className="text-[#97003b]" type="button">
+          <Button aria-label="افزودن مایع دستشویی داو به سبد خرید" className="text-primary-500" size="icon" type="button" variant="ghost">
             <Image alt="سبد خرید" height={24} src="/icon/productCard/cartp.svg" width={24} />
-          </button>
+          </Button>
           <div>
             <div className="flex items-center gap-1 text-[10px]">
               <del className="text-zinc-400">۴۶۸,۱۰۰</del>
-              <span className="rounded-sm bg-[#fff7f7] px-1.5 font-bold text-[#d81968]">{discount}</span>
+              <span className="rounded-sm bg-red-50 px-1.5 font-bold text-red-700">{discount}</span>
             </div>
             <p className="mt-1 whitespace-nowrap text-xs font-medium text-zinc-700">{price}</p>
           </div>
@@ -118,24 +122,25 @@ export function ProductsShelf({
       <div className="mx-auto max-w-[77.5rem] px-4 py-8 sm:px-5 md:py-10">
         <div className="mb-4 flex items-center justify-between md:mb-5" dir="rtl">
           <h2 className={`text-base font-bold md:text-lg ${styles.title}`} id={titleId}>{title}</h2>
-          <a className={`text-xs font-semibold transition-colors md:text-sm ${styles.viewAll}`} href={viewAllHref}>
+          <Link className={`text-xs font-semibold transition-colors md:text-sm ${styles.viewAll}`} href={viewAllHref}>
             مشاهده همه
-          </a>
+          </Link>
         </div>
 
         {categories && categories.length > 0 && (
           <div className="mb-4 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" dir="rtl">
             {categories.map((category) => (
-              <button
-                className={`shrink-0 rounded-md px-4 py-2 text-sm transition-colors ${
+              <Button
+                className={`h-auto shrink-0 rounded-md px-4 py-2 text-sm transition-colors ${
                   activeCategory === category ? styles.activeTab : styles.tab
                 }`}
                 key={category}
                 onClick={() => setActiveCategory(category)}
                 type="button"
+                variant="ghost"
               >
                 {category}
-              </button>
+              </Button>
             ))}
           </div>
         )}

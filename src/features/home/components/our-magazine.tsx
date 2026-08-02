@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 type MagazineArticle = {
   title: string;
@@ -26,17 +27,17 @@ export function OurMagazine({ articles, viewAllHref = "#" }: OurMagazineProps) {
         >
           مجله ما
         </h2>
-        <a
-          className="absolute left-0 top-1/2 -translate-y-1/2 whitespace-nowrap text-xs font-bold leading-none text-[#d81968] transition-colors hover:text-[#97003b] md:text-sm"
+        <Link
+          className="absolute left-0 top-1/2 -translate-y-1/2 whitespace-nowrap text-xs font-bold leading-none text-secondary-700 transition-colors hover:text-primary-500 md:text-sm"
           href={viewAllHref}
         >
           مشاهده همه
-        </a>
+        </Link>
       </div>
 
       <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:-mx-5 sm:px-5 md:mx-0 md:gap-5 md:px-0 [&::-webkit-scrollbar]:hidden">
         {articles.map((article) => (
-          <a
+          <Link
             className="group relative aspect-[0.8] w-[42%] shrink-0 snap-start overflow-hidden rounded-md bg-zinc-100 sm:w-48 md:w-64"
             href={article.href ?? "#"}
             key={`${article.title}-${article.image}`}
@@ -59,7 +60,7 @@ export function OurMagazine({ articles, viewAllHref = "#" }: OurMagazineProps) {
                 {article.title}
               </h3>
             </div>
-          </a>
+          </Link>
         ))}
       </div>
     </section>

@@ -31,7 +31,7 @@ export function ProductCategories({
           دسته بندی محصولات
         </h2>
         <a
-          className="text-xs font-semibold text-[#d81968] transition-colors hover:text-[#97003b] md:text-sm"
+          className="text-xs font-semibold text-secondary-700 transition-colors hover:text-primary-500 md:text-sm"
           href="#"
         >
           مشاهده بیشتر

@@ -1,7 +1,5 @@
-import {
-  getStoreCategories,
-  ProductCategories,
-} from "@/features/categories";
+import { ProductCategories } from "@/features/categories";
+import { getStoreCategories } from "@/features/categories/api/get-store-categories";
 import { FeaturedBrands, HomeHero, OurMagazine, ProductsShelf, SingleBanner } from "@/features/home";
 import { SiteFooter, SiteHeader } from "@/features/navigation";
 
