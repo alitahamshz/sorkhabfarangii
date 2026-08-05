@@ -1,7 +1,14 @@
+"use client";
+
 import { ArrowRight, Bell, Menu, Moon } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 export function AdminHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
+  const pathname = usePathname();
+  const isProductsPage = pathname.startsWith("/admin/products");
+  const title = isProductsPage ? "لیست محصولات" : "نمای کلی";
+
   return (
     <>
       {/* دکمه مستقل منو در نسخه موبایل */}
@@ -19,7 +26,7 @@ export function AdminHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
       </div>
 
       {/* هدر کارت‌مانند در موبایل و هدر سراسری در دسکتاپ */}
-      <header className="mx-4 flex h-[60px] items-center justify-between rounded-lg border-b border-zinc-200 bg-white px-4 shadow-[0_1px_2px_rgba(0,0,0,0.06)] lg:mx-0 lg:h-20 lg:rounded-none lg:border-b-2 lg:border-zinc-800 lg:px-7 lg:shadow-none">
+      <header className="sticky top-0 z-20 mx-4 flex h-[60px] items-center justify-between rounded-lg border-b border-zinc-200 bg-white px-4 shadow-[0_1px_2px_rgba(0,0,0,0.06)] lg:mx-0 lg:h-20 lg:rounded-none lg:px-7 lg:shadow-none">
         <div className="flex items-start gap-3">
           <Button
             aria-label="بازگشت"
@@ -33,11 +40,17 @@ export function AdminHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
           </Button>
 
           <div>
-            <h1 className="text-base font-medium text-zinc-900 lg:text-xl">نمای کلی</h1>
+            <h1 className="text-base font-medium text-zinc-900 lg:text-xl">{title}</h1>
             <div className="mt-1 flex items-center gap-1.5 text-[9px] lg:mt-1.5 lg:text-[10px]">
               <span className="text-zinc-400">داشبورد</span>
               <span className="text-zinc-400">&gt;</span>
-              <span className="font-medium text-primary-500">صفحه فعلی</span>
+              {isProductsPage ? (
+                <>
+                  <span className="text-zinc-400">محصولات</span>
+                  <span className="text-zinc-400">&gt;</span>
+                </>
+              ) : null}
+              <span className="font-medium text-primary-500">{title}</span>
             </div>
           </div>
         </div>

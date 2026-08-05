@@ -8,7 +8,7 @@ import { TopProducts } from "./top-products";
 export function AdminDashboardOverview() {
   return (
     <div className="w-full min-w-0 max-w-full space-y-4 overflow-x-hidden p-4 lg:space-y-5 lg:p-6">
-      <section aria-label="آمار کلی" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section aria-label="آمار کلی" className="grid grid-cols-2 gap-4 xl:grid-cols-4">
         {dashboardStats.map((stat) => (
           <DashboardStatCard key={stat.title} stat={stat} />
         ))}

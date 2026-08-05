@@ -39,7 +39,8 @@ export function MobileMenuDrawer({
     >
       <SheetContent
         aria-label="منوی موبایل"
-        className="w-[70vw] max-w-none gap-0 overflow-y-auto rounded-l-lg border-0 bg-white p-0 shadow-2xl sm:max-w-none"
+        className="mobile-menu-sheet w-[70vw] max-w-none gap-0 overflow-y-auto rounded-l-lg border-0 bg-white p-0 shadow-2xl sm:max-w-none"
+        overlayClassName="opacity-100! transition-none! data-ending-style:opacity-100! data-starting-style:opacity-100!"
         showCloseButton={false}
         side="right"
       >

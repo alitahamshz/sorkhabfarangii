@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
 import {
   BadgePercent,
   Box,
@@ -8,7 +9,6 @@ import {
   ChevronDown,
   ChevronUp,
   LogOut,
-  Presentation,
   Settings,
   ShoppingBag,
   Store,
@@ -53,14 +53,15 @@ export function AdminSidebar({
   isOpen: boolean;
   onClose: () => void;
 }) {
+  const pathname = usePathname();
+  const router = useRouter();
   const [expandedItem, setExpandedItem] = useState<string | null>("products");
 
   return (
     <aside
       aria-label="منوی داشبورد ادمین"
-      className={`fixed inset-y-0 right-0 z-40 flex w-[313px] max-w-[88vw] flex-col rounded-l-2xl bg-primary-500 px-6 pb-5 pt-6 text-white shadow-xl transition-transform duration-300 lg:translate-x-0 ${
-        isOpen ? "translate-x-0" : "translate-x-full"
-      }`}
+      className={`fixed inset-y-0 right-0 z-40 flex w-[313px] max-w-[88vw] flex-col rounded-l-2xl bg-primary-500 px-6 pb-5 pt-6 text-white shadow-xl transition-transform duration-300 lg:translate-x-0 ${isOpen ? "translate-x-0" : "translate-x-full"
+        }`}
     >
       <div className="flex shrink-0 justify-center pb-5">
         <Image
@@ -77,12 +78,22 @@ export function AdminSidebar({
 
       <nav className="mt-6 min-h-0 flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <Button
-          className="flex h-11 w-full cursor-pointer items-center gap-3 px-3 text-right text-base font-semibold"
-          onClick={onClose}
+          className="flex h-11 w-full cursor-pointer items-center justify-start gap-3 px-3 text-right text-base font-semibold"
+          onClick={() => {
+            router.push("/admin");
+            onClose();
+          }}
           type="button"
           variant="ghost"
         >
-          <Presentation size={23} strokeWidth={1.6} />
+          <span
+            aria-hidden="true"
+            className="size-[23px] shrink-0 bg-current transition-colors"
+            style={{
+              mask: "url('/icon/adminDashboard/dashboardIcon.svg') center / contain no-repeat",
+              WebkitMask: "url('/icon/adminDashboard/dashboardIcon.svg') center / contain no-repeat",
+            }}
+          />
           <span>نمای کلی</span>
         </Button>
 
@@ -95,11 +106,10 @@ export function AdminSidebar({
               <div key={item.id}>
                 <Button
                   aria-expanded={isExpanded}
-                  className={`flex h-[47px] w-full cursor-pointer items-center rounded-xl px-3 text-right transition-colors ${
-                    isExpanded
+                  className={`flex h-[47px] w-full cursor-pointer items-center rounded-xl px-3 text-right transition-colors ${isExpanded
                       ? "bg-primary-50 text-zinc-900 shadow-[0_8px_14px_rgba(0,0,0,0.2)]"
                       : "text-white hover:bg-white/10"
-                  }`}
+                    }`}
                   onClick={() => setExpandedItem(isExpanded ? null : item.id)}
                   type="button"
                   variant="ghost"
@@ -117,9 +127,15 @@ export function AdminSidebar({
                   <div className="mx-2 mt-5 rounded-xl bg-white px-5 py-2 text-zinc-800 shadow-sm">
                     {item.children.map((child) => (
                       <Button
-                        className="block h-[44px] w-full cursor-pointer text-right text-[13px] transition-colors hover:text-primary-500"
+                        className={`block h-[44px] w-full cursor-pointer text-right text-[13px] transition-colors hover:text-primary-500 ${child === "لیست محصولات" && pathname.startsWith("/admin/products")
+                            ? "bg-zinc-100 font-semibold text-primary-500"
+                            : ""
+                          }`}
                         key={child}
-                        onClick={onClose}
+                        onClick={() => {
+                          if (child === "لیست محصولات") router.push("/admin/products");
+                          onClose();
+                        }}
                         type="button"
                         variant="ghost"
                       >
