@@ -11,6 +11,12 @@ import {
   toClientSession,
 } from "@/features/auth/server/session";
 
+function maskToken(token: string | undefined) {
+  if (!token) return token;
+  if (token.length <= 14) return "••••••••";
+  return `${token.slice(0, 8)}••••••••${token.slice(-6)}`;
+}
+
 export async function POST(request: Request) {
   let input: VerifyAdminOtpInput;
 
@@ -30,6 +36,11 @@ export async function POST(request: Request) {
       input,
       { cache: "no-store" },
     );
+
+    console.info("[auth/verify-otp] پاسخ وب‌سرویس PHP:", {
+      ...payload,
+      token: maskToken(payload.token),
+    });
 
     if (payload.status === "false" || !payload.token) {
       return NextResponse.json(
@@ -53,11 +64,19 @@ export async function POST(request: Request) {
     return response;
   } catch (error) {
     if (isApiError(error)) {
+      console.error("[auth/verify-otp] خطای وب‌سرویس PHP:", {
+        code: error.code,
+        data: error.data,
+        message: error.message,
+        status: error.status,
+      });
       return NextResponse.json(
         error.data ?? { message: error.message },
         { status: error.status || 502 },
       );
     }
+
+    console.error("[auth/verify-otp] خطای ساخت Session:", error);
 
     return NextResponse.json(
       { message: "ارتباط با سرویس تأیید کد برقرار نشد." },
