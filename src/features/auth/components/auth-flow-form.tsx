@@ -19,6 +19,9 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { isApiError } from "@/lib/api";
+import { useSendAdminOtp } from "../hooks/use-send-admin-otp";
+import { useVerifyAdminOtp } from "../hooks/use-verify-admin-otp";
 import { AUTH_ROUTES, type AuthAudience } from "../config/auth-routes";
 
 type AuthStep = "login" | "otp";
@@ -50,12 +53,43 @@ function normalizeDigits(value: string) {
     .replace(/\D/g, "");
 }
 
+function getAdminLoginErrorMessage(error: unknown) {
+  const apiError = isApiError(error) ? error : undefined;
+  const payload = apiError?.data ?? error;
+  const data =
+    payload && typeof payload === "object"
+      ? (payload as Record<string, unknown>)
+      : undefined;
+  const status = Number(apiError?.status ?? data?.["status code"]);
+  const description = typeof data?.discript === "string" ? data.discript : "";
+
+  if (status === 503) {
+    return "سرویس ارسال کد موقتاً در دسترس نیست. چند دقیقه دیگر تلاش کنید.";
+  }
+  if (status === 502) {
+    return "ارتباط با سرویس ارسال کد برقرار نشد. دوباره تلاش کنید.";
+  }
+  if (status === 404) {
+    return "سرویس ارسال کد یافت نشد. لطفاً با پشتیبانی تماس بگیرید.";
+  }
+  if (status === 400 && /non-standard characters/i.test(description)) {
+    return "شماره موبایل را فقط با اعداد انگلیسی وارد کنید.";
+  }
+  if (status === 400) {
+    return "شماره موبایل نامعتبر است.";
+  }
+
+  return description || "ارسال کد تأیید با خطا مواجه شد. دوباره تلاش کنید.";
+}
+
 function AdminLoginForm() {
   const router = useRouter();
   const [value, setValue] = useState("");
   const [touched, setTouched] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [dark, setDark] = useState(false);
+  const [requestError, setRequestError] = useState("");
+  const { isPending: isSendingOtp, mutate: sendOtp } = useSendAdminOtp();
 
   const normalizedValue = normalizeDigits(value);
   const isValid = /^09\d{9}$/.test(normalizedValue);
@@ -69,7 +103,24 @@ function AdminLoginForm() {
 
     if (!isValid) return;
 
-    router.push(AUTH_ROUTES.admin.otp);
+    setRequestError("");
+    sendOtp(
+      { phone_number: normalizedValue },
+      {
+        onSuccess: (response) => {
+          if (response.status === "false") {
+            setRequestError(getAdminLoginErrorMessage(response));
+            return;
+          }
+
+          window.sessionStorage.setItem("admin_otp_phone_number", normalizedValue);
+          router.push(AUTH_ROUTES.admin.otp);
+        },
+        onError: (requestError) => {
+          setRequestError(getAdminLoginErrorMessage(requestError));
+        },
+      },
+    );
   }
 
   return (
@@ -170,14 +221,15 @@ function AdminLoginForm() {
               شماره موبایل نادرست است
             </p>
           ) : null}
+          {requestError ? <p className="mt-1.5 text-xs text-red-600">{requestError}</p> : null}
 
           <Button
             className="mt-auto h-12 w-full rounded-lg bg-primary-500 text-[14px] font-medium text-white transition enabled:cursor-pointer enabled:hover:bg-primary-600 enabled:active:scale-[0.995] disabled:cursor-not-allowed disabled:bg-primary-200 max-[480px]:mt-[42px]"
-            disabled={!isValid}
+            disabled={!isValid || isSendingOtp}
             size="lg"
             type="submit"
           >
-            ورود
+            {isSendingOtp ? "در حال ارسال کد..." : "ورود"}
           </Button>
         </form>
 
@@ -199,7 +251,15 @@ function AdminOtpForm() {
   const [otp, setOtp] = useState("");
   const [dark, setDark] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [phoneNumber] = useState(() =>
+    typeof window === "undefined"
+      ? ""
+      : (window.sessionStorage.getItem("admin_otp_phone_number") ?? ""),
+  );
+  const [error, setError] = useState("");
   const isComplete = otp.length === 5;
+
+  const { isPending: isVerifying, mutate: verifyOtp } = useVerifyAdminOtp();
 
   useEffect(() => {
     if (!success) return;
@@ -213,7 +273,26 @@ function AdminOtpForm() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!isComplete) return;
-    setSuccess(true);
+
+    if (!/^09\d{9}$/.test(phoneNumber)) {
+      setError("شماره موبایل یافت نشد؛ لطفاً دوباره وارد شوید.");
+      return;
+    }
+
+    setError("");
+    verifyOtp(
+      { phone_number: phoneNumber, code: otp },
+      {
+        onSuccess: () => setSuccess(true),
+        onError: (requestError) => {
+        setError(
+          isApiError(requestError)
+            ? requestError.message
+            : "تأیید کد با خطا مواجه شد. دوباره تلاش کنید.",
+        );
+        },
+      },
+    );
   }
 
   return (
@@ -288,6 +367,8 @@ function AdminOtpForm() {
             </InputOTP>
           </div>
 
+          {error ? <p className="mt-2 text-xs text-red-600">{error}</p> : null}
+
           {/* ویرایش شماره و ارسال مجدد کد OTP */}
           <div className="mt-3 flex items-center justify-between text-[11px]">
             <Link className="text-primary-500 underline underline-offset-2" href={AUTH_ROUTES.admin.login}>
@@ -305,11 +386,11 @@ function AdminOtpForm() {
           {/* دکمه تأیید OTP */}
           <Button
             className="mt-auto h-12 w-full rounded-lg bg-primary-500 text-[14px] font-medium text-white transition enabled:cursor-pointer enabled:hover:bg-primary-600 enabled:active:scale-[0.995] disabled:cursor-not-allowed disabled:bg-primary-200 max-[480px]:mt-[42px]"
-            disabled={!isComplete || success}
+            disabled={!isComplete || success || isVerifying}
             size="lg"
             type="submit"
           >
-            تأیید و ورود
+            {isVerifying ? "در حال تأیید..." : "تأیید و ورود"}
           </Button>
         </form>
 
