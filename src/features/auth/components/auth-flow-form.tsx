@@ -288,6 +288,10 @@ function AdminOtpForm() {
       {
         onSuccess: (response) => {
           console.log("[main_admin/otpVerify] raw backend response:", response);
+          if (response.status === "false") {
+            setError(response.discript || "کد تأیید نامعتبر است.");
+            return;
+          }
           setSuccess(true);
         },
         onError: (requestError) => {
