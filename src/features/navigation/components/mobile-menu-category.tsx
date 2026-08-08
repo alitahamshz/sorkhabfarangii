@@ -1,5 +1,4 @@
 import { ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { CategoryIcon, type MenuCategory } from "@/features/categories";
 import { MobileMenuGroup } from "./mobile-menu-group";
 
@@ -20,12 +19,11 @@ export function MobileMenuCategory({
 }: MobileMenuCategoryProps) {
   return (
     <section className="border-b border-zinc-100 pb-3">
-      <Button
+      <button
         aria-expanded={isOpen}
-        className="flex h-auto w-full items-center justify-between px-0 py-0.5 text-base font-bold text-zinc-500"
+        className="flex w-full items-center justify-between py-0.5 text-base font-bold text-zinc-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
         onClick={onToggle}
         type="button"
-        variant="ghost"
       >
         <span className="flex items-center gap-2">
           <CategoryIcon name={category.name} />
@@ -38,7 +36,7 @@ export function MobileMenuCategory({
           size={20}
           strokeWidth={1.7}
         />
-      </Button>
+      </button>
 
       <div
         className={`grid transition-[grid-template-rows] duration-300 ease-out ${

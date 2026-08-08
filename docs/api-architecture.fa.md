@@ -261,18 +261,18 @@ if (isApiError(error)) {
 
 در صورت نیاز به SSR همراه TanStack Query، برای همان route از `HydrationBoundary` و `dehydrate` استفاده خواهد شد؛ نیازی نیست از ابتدا تمام صفحات را hydrate کنیم.
 
-## فاز دوم: احراز هویت
+## احراز هویت و Session
 
-بعد از دریافت قرارداد دقیق وب‌سرویس login/OTP، مسیر پیشنهادی چنین است:
+احراز هویت OTP ادمین اکنون با این مسیر پیاده‌سازی شده است:
 
 ```text
-Login Form
+Admin OTP Form
    ↓
 useMutation
    ↓
-POST /api/auth/login (Next.js Route Handler)
+POST /api/auth/admin/verify-otp (Next.js Route Handler)
    ↓
-Backend Login API
+Backend OTP Verify API
    ↓
 Token returned to Next.js only
    ↓
@@ -281,14 +281,14 @@ Set secure httpOnly cookie
 Return sanitized user/session to browser
 ```
 
-اصول فاز دوم:
+اصول پیاده‌سازی:
 
 - token داخل `localStorage` یا state کلاینت ذخیره نمی‌شود.
 - token از Route Handler به JavaScript مرورگر برگردانده نمی‌شود.
 - cookie با گزینه‌های `httpOnly`، `secure` و `sameSite` مناسب ذخیره می‌شود.
 - endpointی مانند `/api/auth/session` اطلاعات امن و خلاصه کاربر را برمی‌گرداند.
 - وضعیت user/session با query مشخصی مانند `["auth", "session"]` مدیریت می‌شود.
-- logout cookie را روی سرور پاک و query مربوط به session را invalidate می‌کند.
+- logout کوکی‌ها را روی سرور پاک و query مربوط به session را به `null` تغییر می‌دهد.
 - نقش و دسترسی همیشه در سرور بررسی می‌شود؛ مخفی‌کردن دکمه در UI مجوز امنیتی محسوب نمی‌شود.
 
-جزئیات refresh token، زمان انقضا، roleها و پاسخ session بعد از دریافت قرارداد واقعی بک‌اند طراحی خواهند شد.
+راهنمای کامل endpointها، متغیرهای محیطی و نمونه استفاده در Client و Server در [مستند Session](./auth-session.fa.md) قرار دارد.

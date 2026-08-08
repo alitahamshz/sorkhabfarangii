@@ -22,6 +22,7 @@ import {
 import { isApiError } from "@/lib/api";
 import { useSendAdminOtp } from "../hooks/use-send-admin-otp";
 import { useVerifyAdminOtp } from "../hooks/use-verify-admin-otp";
+import { useWebOtp } from "../hooks/use-web-otp";
 import { AUTH_ROUTES, type AuthAudience } from "../config/auth-routes";
 
 type AuthStep = "login" | "otp";
@@ -261,6 +262,8 @@ function AdminOtpForm() {
 
   const { isPending: isVerifying, mutate: verifyOtp } = useVerifyAdminOtp();
 
+  useWebOtp(setOtp, 5);
+
   useEffect(() => {
     if (!success) return;
     const timer = window.setTimeout(
@@ -344,11 +347,13 @@ function AdminOtpForm() {
           {/* پنج اینپوت مجزای کد OTP */}
           <div className="w-full" dir="ltr">
             <InputOTP
+              autoComplete="one-time-code"
               autoFocus
               containerClassName="w-full [direction:ltr]"
               dir="ltr"
               inputMode="numeric"
               maxLength={5}
+              name="otp"
               onChange={(value) => setOtp(normalizeDigits(value).slice(0, 5))}
               value={otp}
             >
@@ -430,6 +435,8 @@ function DefaultAuthForm({ audience, step }: { audience: AuthAudience; step: Aut
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const isLoginStep = step === "login";
+
+  useWebOtp(setValue, 5, 6, !isLoginStep);
 
   useEffect(() => {
     if (!success) return;

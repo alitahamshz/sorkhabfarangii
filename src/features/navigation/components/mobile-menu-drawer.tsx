@@ -1,14 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { useEffect, useRef, useState } from "react";
 import type { MenuCategory } from "@/features/categories";
 import { BrandLogo } from "./brand-logo";
 import { MobileMenuCategory } from "./mobile-menu-category";
@@ -29,33 +22,65 @@ export function MobileMenuDrawer({
     categories[0]?.id ?? null,
   );
   const [openGroupId, setOpenGroupId] = useState<string | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    document.body.style.overflow = "hidden";
+    closeButtonRef.current?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+      previouslyFocused?.focus();
+    };
+  }, [isOpen, onClose]);
 
   return (
-    <Sheet
-      onOpenChange={(open) => {
-        if (!open) onClose();
-      }}
-      open={isOpen}
+    <div
+      aria-hidden={!isOpen}
+      className={`fixed inset-0 z-50 md:hidden ${isOpen ? "pointer-events-auto" : "pointer-events-none"}`}
+      inert={!isOpen}
     >
-      <SheetContent
+      <button
+        aria-label="بستن منو"
+        className={`absolute inset-0 bg-black/25 transition-opacity duration-300 ease-out ${
+          isOpen ? "opacity-100" : "opacity-0"
+        }`}
+        onClick={onClose}
+        tabIndex={-1}
+        type="button"
+      />
+      <aside
         aria-label="منوی موبایل"
-        className="mobile-menu-sheet w-[70vw] max-w-none gap-0 overflow-y-auto rounded-l-lg border-0 bg-white p-0 shadow-2xl sm:max-w-none"
-        overlayClassName="opacity-100! transition-none! data-ending-style:opacity-100! data-starting-style:opacity-100!"
-        showCloseButton={false}
-        side="right"
+        aria-modal="true"
+        className={`absolute inset-y-0 right-0 w-[70vw] overflow-y-auto rounded-l-lg bg-white shadow-2xl transition-transform duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform ${
+          isOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+        dir="rtl"
+        role="dialog"
       >
-        <SheetTitle className="sr-only">منوی موبایل</SheetTitle>
+        <h2 className="sr-only">منوی موبایل</h2>
         <div
           className="flex h-25 items-center justify-start gap-5 border-b border-zinc-100 px-7"
-          dir="rtl"
         >
-          <SheetClose
-            render={
-              <Button aria-label="بستن منو" size="icon-lg" type="button" variant="ghost" />
-            }
+          <button
+            aria-label="بستن منو"
+            className="inline-flex size-10 items-center justify-center rounded-full text-zinc-500 transition-colors hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+            onClick={onClose}
+            ref={closeButtonRef}
+            type="button"
           >
             <X className="text-zinc-500" size={34} strokeWidth={1.5} />
-          </SheetClose>
+          </button>
           <BrandLogo />
         </div>
 
@@ -81,7 +106,7 @@ export function MobileMenuDrawer({
             />
           ))}
         </div>
-      </SheetContent>
-    </Sheet>
+      </aside>
+    </div>
   );
 }

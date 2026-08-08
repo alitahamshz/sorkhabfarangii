@@ -1,4 +1,5 @@
-import { clientApi } from "@/lib/api/client";
+import { createApiClient } from "@/lib/api";
+import type { AuthSession } from "../types/session";
 
 export type VerifyAdminOtpInput = {
   /** شماره موبایل ۱۱ رقمی؛ به‌صورت string برای حفظ صفر ابتدایی. */
@@ -18,9 +19,14 @@ export type AdminOtpVerification = {
   token: string;
 };
 
+const nextApi = createApiClient({
+  baseUrl: "/api",
+  credentials: "include",
+});
+
 export function verifyAdminOtp(input: VerifyAdminOtpInput) {
-  return clientApi.post<AdminOtpVerification, VerifyAdminOtpInput>(
-    "/main_admin/otpVerify",
+  return nextApi.post<AuthSession, VerifyAdminOtpInput>(
+    "/auth/admin/verify-otp",
     input,
   );
 }
