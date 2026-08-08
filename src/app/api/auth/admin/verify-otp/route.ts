@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       input,
       { cache: "no-store" },
     );
-
+    console.log({payyy:payload})
     if (payload.status === "false" || !payload.token) {
       return NextResponse.json(
         { message: payload.discript || "کد تأیید صحیح نیست." },

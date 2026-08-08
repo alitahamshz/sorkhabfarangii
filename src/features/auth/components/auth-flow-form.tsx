@@ -286,9 +286,20 @@ function AdminOtpForm() {
     verifyOtp(
       { phone_number: phoneNumber, code: otp },
       {
-        onSuccess: () => setSuccess(true),
+        onSuccess: (response) => {
+          console.log("[main_admin/otpVerify] raw backend response:", response);
+          setSuccess(true);
+        },
         onError: (requestError) => {
-        setError(
+          if (isApiError(requestError)) {
+            console.error(
+              "[main_admin/otpVerify] raw backend error response:",
+              requestError.data,
+            );
+          } else {
+            console.error("[main_admin/otpVerify] request error:", requestError);
+          }
+          setError(
           isApiError(requestError)
             ? requestError.message
             : "تأیید کد با خطا مواجه شد. دوباره تلاش کنید.",
