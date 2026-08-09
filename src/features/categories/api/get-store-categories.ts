@@ -1,17 +1,16 @@
+"use client";
+
 import { buildCategoryMenu } from "../lib/build-category-menu";
 import type { CategoryResponse, MenuCategory } from "../model/types";
-import { serverApi } from "@/lib/api/server";
+import { clientApi } from "@/lib/api/client";
 
 export async function getStoreCategories(): Promise<MenuCategory[]> {
-  try {
-    const payload = await serverApi.get<CategoryResponse>("/user/category", {
-      next: { revalidate: 300 },
-      timeoutMs: 8_000,
-    });
-    if (payload.status !== "success" || !Array.isArray(payload.res)) return [];
+  const payload = await clientApi.get<CategoryResponse>("/user/category/index.php", {
+    credentials: "omit",
+    timeoutMs: 8_000,
+  });
 
-    return buildCategoryMenu(payload.res);
-  } catch {
-    return [];
-  }
+  if (payload.status !== "success" || !Array.isArray(payload.res)) return [];
+
+  return buildCategoryMenu(payload.res);
 }

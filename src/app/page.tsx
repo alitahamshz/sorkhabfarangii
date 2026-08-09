@@ -1,10 +1,19 @@
+"use client";
+
+import { useEffect } from "react";
 import { ProductCategories } from "@/features/categories";
-import { getStoreCategories } from "@/features/categories/api/get-store-categories";
+import { useStoreCategories } from "@/features/categories/hooks/use-store-categories";
 import { FeaturedBrands, HomeHero, OurMagazine, ProductsShelf, SingleBanner } from "@/features/home";
 import { SiteFooter, SiteHeader } from "@/features/navigation";
 
-export default async function Home() {
-  const categories = await getStoreCategories();
+export default function Home() {
+  const { data: categories = [], error } = useStoreCategories();
+
+  useEffect(() => {
+    if (error) {
+      console.error("Failed to load store categories:", error);
+    }
+  }, [error]);
 
   return (
     <main className="relative min-h-screen bg-white text-stone-900">

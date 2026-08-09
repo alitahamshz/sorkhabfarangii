@@ -33,7 +33,7 @@ export function SessionPreview({ session }: { session: ServerAuthSession }) {
         ))}
       </dl>
 
-      <div className="border-t border-zinc-100 bg-zinc-50 px-5 py-4 md:px-6">
+      {/* <div className="border-t border-zinc-100 bg-zinc-50 px-5 py-4 md:px-6">
         <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-xs text-zinc-500">Access token امن (نمایش ماسک‌شده)</span>
           <code className="break-all text-left font-mono text-xs text-primary-500" dir="ltr">
@@ -43,7 +43,7 @@ export function SessionPreview({ session }: { session: ServerAuthSession }) {
         <p className="mt-2 text-[11px] leading-5 text-zinc-400">
           مقدار کامل توکن فقط در cookie از نوع HttpOnly و کد سمت سرور قابل دسترسی است.
         </p>
-      </div>
+      </div> */}
     </DashboardPanel>
   );
 }

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import {
   Check,
   CheckCircle2,
@@ -189,8 +189,8 @@ function AdminLoginForm() {
               className={`h-12 w-full rounded-lg border bg-transparent px-11 text-left text-[13px] outline-none transition placeholder:text-neutral-400 ${isInvalid
                   ? "border-red-600 focus:ring-2 focus:ring-red-100"
                   : dark
-                    ? "border-neutral-600 text-white focus:border-neutral-400 focus:ring-2 focus:ring-white/10"
-                    : "border-neutral-200 text-neutral-600 focus:border-neutral-400 focus:ring-2 focus:ring-neutral-100"
+                    ? "border-neutral-600 text-white focus:border-neutral-400 focus:ring-2 focus:ring-white/10 focus-visible:border-neutral-400 focus-visible:ring-white/10"
+                    : "border-neutral-200 text-neutral-600 focus:border-neutral-400 focus:ring-2 focus:ring-neutral-100 focus-visible:border-neutral-400 focus-visible:ring-neutral-100"
                 }`}
               dir="ltr"
               id="admin-login"
@@ -249,6 +249,8 @@ function AdminLoginForm() {
 // ==================== شروع بخش OTP ادمین ====================
 function AdminOtpForm() {
   const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
+  const lastAutoSubmittedOtpRef = useRef("");
   const [otp, setOtp] = useState("");
   const [dark, setDark] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -272,6 +274,14 @@ function AdminOtpForm() {
     );
     return () => window.clearTimeout(timer);
   }, [router, success]);
+
+  useEffect(() => {
+    if (!isComplete || isVerifying || success) return;
+    if (lastAutoSubmittedOtpRef.current === otp) return;
+
+    lastAutoSubmittedOtpRef.current = otp;
+    formRef.current?.requestSubmit();
+  }, [isComplete, isVerifying, otp, success]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -354,7 +364,12 @@ function AdminOtpForm() {
         </div>
 
         {/* فرم ورود کد پنج‌رقمی OTP */}
-        <form className="mt-8 flex flex-1 flex-col" noValidate onSubmit={handleSubmit}>
+        <form
+          className="mt-8 flex flex-1 flex-col"
+          noValidate
+          onSubmit={handleSubmit}
+          ref={formRef}
+        >
           <p className={`mb-3 text-[14px] ${dark ? "text-neutral-300" : "text-neutral-500"}`}>
             کد تأیید ۵ رقمی ارسال‌شده را وارد کنید
           </p>
@@ -377,7 +392,7 @@ function AdminOtpForm() {
                   <InputOTPSlot
                     className={`h-12 w-10 min-w-0 flex-1 rounded-lg border text-xl font-medium first:rounded-lg first:border last:rounded-lg ${dark
                       ? "border-neutral-600 bg-transparent text-white data-[active=true]:border-neutral-400 data-[active=true]:ring-white/10"
-                      : "border-neutral-200 bg-transparent text-neutral-600 data-[active=true]:border-primary-500 data-[active=true]:ring-primary-500/10"
+                      : "border-neutral-200 bg-transparent text-neutral-600 data-[active=true]:border-neutral-400 data-[active=true]:ring-neutral-100"
                       }`}
                     index={index}
                     key={index}
@@ -510,7 +525,7 @@ function DefaultAuthForm({ audience, step }: { audience: AuthAudience; step: Aut
             <Input
               autoComplete={isLoginStep ? "tel" : "one-time-code"}
               autoFocus
-              className="h-11 w-full rounded-lg border border-zinc-300 px-3 text-left outline-none transition focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200"
+              className="h-11 w-full rounded-lg border border-zinc-300 px-3 text-left outline-none transition focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 focus-visible:border-zinc-500 focus-visible:ring-zinc-200"
               dir="ltr"
               id={`${audience}-${step}`}
               inputMode="numeric"
