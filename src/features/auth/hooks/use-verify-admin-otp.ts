@@ -9,8 +9,8 @@ export function useVerifyAdminOtp() {
 
   return useMutation({
     mutationFn: verifyAdminOtp,
-    onSuccess: (session) => {
-      queryClient.setQueryData(AUTH_SESSION_QUERY_KEY, session);
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: AUTH_SESSION_QUERY_KEY });
     },
   });
 }
