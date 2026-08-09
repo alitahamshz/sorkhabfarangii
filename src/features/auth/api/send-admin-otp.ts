@@ -1,13 +1,15 @@
-import { createApiClient } from "@/lib/api";
+import { createApiClient, type ApiResponse } from "@/lib/api";
 
 export type SendAdminOtpInput = {
   phone_number: string;
 };
 
-export type SendAdminOtpResponse = {
+export type SendAdminOtpData = {
   status: string;
   send: string;
 };
+
+export type SendAdminOtpResponse = ApiResponse<SendAdminOtpData>;
 
 const nextApi = createApiClient({
   baseUrl: "/api",

@@ -22,7 +22,10 @@ export type ApiCategory = {
   status: string;
 };
 
-export type CategoryResponse = {
+export type CategoryData = {
   status: string;
   res: ApiCategory[];
 };
+
+export type CategoryResponse = ApiResponse<CategoryData>;
+import type { ApiResponse } from "@/lib/api";

@@ -10,7 +10,13 @@ export async function getStoreCategories(): Promise<MenuCategory[]> {
     timeoutMs: 8_000,
   });
 
-  if (payload.status !== "success" || !Array.isArray(payload.res)) return [];
+  if (
+    payload.success !== "true" ||
+    payload.data.status !== "success" ||
+    !Array.isArray(payload.data.res)
+  ) {
+    return [];
+  }
 
-  return buildCategoryMenu(payload.res);
+  return buildCategoryMenu(payload.data.res);
 }

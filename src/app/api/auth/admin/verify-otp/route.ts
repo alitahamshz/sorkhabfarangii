@@ -39,16 +39,21 @@ export async function POST(request: Request) {
     // نشست را برای پاسخ موفق تنظیم می‌کند.
     try {
       const payload = JSON.parse(upstreamBody) as AdminOtpVerification;
-      if (payload.status !== "false" && payload.token) {
+      if (
+        payload.success === "true" &&
+        payload.data.status !== "false" &&
+        payload.data.token
+      ) {
+        const verification = payload.data;
         const session = await createServerSession(
           {
             audience: "admin",
-            family: payload.family ?? "",
-            id: String(payload.id ?? ""),
-            level: payload.level ?? "",
-            name: payload.name ?? "",
+            family: verification.family ?? "",
+            id: String(verification.id ?? ""),
+            level: verification.level ?? "",
+            name: verification.name ?? "",
           },
-          payload.token,
+          verification.token,
         );
         await setAuthCookies(response, session);
       }
@@ -60,7 +65,13 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("[main_admin/otpVerify] upstream request failed:", error);
     return NextResponse.json(
-      { message: "OTP_VERIFY_UPSTREAM_UNREACHABLE" },
+      {
+        success: "false",
+        statusCode: "502",
+        message: "OTP_VERIFY_UPSTREAM_UNREACHABLE",
+        data: null,
+        meta: [],
+      },
       { status: 502 },
     );
   }

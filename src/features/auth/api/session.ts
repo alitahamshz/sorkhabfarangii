@@ -1,4 +1,4 @@
-import { createApiClient } from "@/lib/api";
+import { createApiClient, type ApiResponse } from "@/lib/api";
 import type { AuthSession } from "../types/session";
 
 const nextApi = createApiClient({
@@ -6,10 +6,14 @@ const nextApi = createApiClient({
   credentials: "include",
 });
 
-export function getSession() {
-  return nextApi.get<AuthSession | null>("/auth/session", { cache: "no-store" });
+export async function getSession() {
+  const response = await nextApi.get<ApiResponse<AuthSession | null>>(
+    "/auth/session",
+    { cache: "no-store" },
+  );
+  return response.data;
 }
 
 export function signOut() {
-  return nextApi.post<{ success: true }>("/auth/logout");
+  return nextApi.post<ApiResponse<null>>("/auth/logout");
 }

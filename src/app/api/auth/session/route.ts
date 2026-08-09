@@ -3,7 +3,14 @@ import { getServerSession, toClientSession } from "@/features/auth/server/sessio
 
 export async function GET() {
   const session = await getServerSession();
-  return NextResponse.json(session ? toClientSession(session) : null, {
-    headers: { "Cache-Control": "no-store" },
-  });
+  return NextResponse.json(
+    {
+      success: "true",
+      statusCode: "200",
+      message: "Successful",
+      data: session ? toClientSession(session) : null,
+      meta: [],
+    },
+    { headers: { "Cache-Control": "no-store" } },
+  );
 }

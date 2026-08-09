@@ -1,4 +1,4 @@
-import { createApiClient } from "@/lib/api";
+import { createApiClient, type ApiResponse } from "@/lib/api";
 
 export type VerifyAdminOtpInput = {
   /** شماره موبایل ۱۱ رقمی؛ به‌صورت string برای حفظ صفر ابتدایی. */
@@ -7,7 +7,7 @@ export type VerifyAdminOtpInput = {
   code: string;
 };
 
-export type AdminOtpVerification = {
+export type AdminOtpVerificationData = {
   status: string;
   name: string;
   family: string;
@@ -17,6 +17,8 @@ export type AdminOtpVerification = {
   id: string | number;
   token: string;
 };
+
+export type AdminOtpVerification = ApiResponse<AdminOtpVerificationData>;
 
 const nextApi = createApiClient({
   baseUrl: "/api",

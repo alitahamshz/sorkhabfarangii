@@ -61,8 +61,16 @@ function getAdminLoginErrorMessage(error: unknown) {
     payload && typeof payload === "object"
       ? (payload as Record<string, unknown>)
       : undefined;
-  const status = Number(apiError?.status ?? data?.["status code"]);
-  const description = typeof data?.discript === "string" ? data.discript : "";
+  const responseData =
+    data?.data && typeof data.data === "object"
+      ? (data.data as Record<string, unknown>)
+      : data;
+  const status = Number(
+    apiError?.status ?? data?.statusCode ?? data?.["status code"],
+  );
+  const description =
+    typeof responseData?.discript === "string" ? responseData.discript : "";
+  const message = typeof data?.message === "string" ? data.message : "";
 
   if (status === 503) {
     return "سرویس ارسال کد موقتاً در دسترس نیست. چند دقیقه دیگر تلاش کنید.";
@@ -80,7 +88,7 @@ function getAdminLoginErrorMessage(error: unknown) {
     return "شماره موبایل نامعتبر است.";
   }
 
-  return description || "ارسال کد تأیید با خطا مواجه شد. دوباره تلاش کنید.";
+  return description || message || "ارسال کد تأیید با خطا مواجه شد. دوباره تلاش کنید.";
 }
 
 function AdminLoginForm() {
@@ -109,7 +117,7 @@ function AdminLoginForm() {
       { phone_number: normalizedValue },
       {
         onSuccess: (response) => {
-          if (response.status === "false") {
+          if (response.success !== "true" || response.data.status === "false") {
             setRequestError(getAdminLoginErrorMessage(response));
             return;
           }
@@ -237,7 +245,7 @@ function AdminLoginForm() {
         <p className={`mt-6 text-center text-[10px] ${dark ? "text-neutral-400" : "text-neutral-400"}`}>
           ورود به منزله پذیرش{" "}
           <Link className="text-primary-500 underline underline-offset-2" href="/privacy">
-            قوانین حریم خصوصی
+قوانین حریم خصوصی {"  "}
           </Link>
           است.
         </p>
@@ -298,8 +306,10 @@ function AdminOtpForm() {
       {
         onSuccess: (response) => {
           console.log("[main_admin/otpVerify] raw backend response:", response);
-          if (response.status === "false") {
-            setError(response.discript || "کد تأیید نامعتبر است.");
+          if (response.success !== "true" || response.data.status === "false") {
+            setError(
+              response.data.discript || response.message || "کد تأیید نامعتبر است.",
+            );
             return;
           }
           setSuccess(true);

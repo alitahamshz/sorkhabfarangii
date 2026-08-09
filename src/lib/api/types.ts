@@ -1,5 +1,15 @@
 export type QueryPrimitive = string | number | boolean | null | undefined;
 
+export type ApiMeta = readonly unknown[] | Record<string, unknown>;
+
+export type ApiResponse<TData, TMeta extends ApiMeta = readonly unknown[]> = {
+  success: "true" | "false";
+  statusCode: string;
+  message: string;
+  data: TData;
+  meta: TMeta;
+};
+
 export type QueryValue = QueryPrimitive | readonly QueryPrimitive[];
 
 export type QueryParams = Record<string, QueryValue>;

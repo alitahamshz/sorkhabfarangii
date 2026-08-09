@@ -7,7 +7,6 @@ import {
   Box,
   ChartNoAxesColumnIncreasing,
   ChevronDown,
-  ChevronUp,
   LogOut,
   Settings,
   ShoppingBag,
@@ -17,6 +16,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { AUTH_ROUTES, useSession, useSignOut } from "@/features/auth";
 
 type SidebarItem = {
   id: string;
@@ -38,7 +38,16 @@ const sidebarItems: SidebarItem[] = [
       "ویژگی ها و متغیرها",
     ],
   },
-  { id: "inventory", label: "انبار موجودی", icon: Store },
+  {
+    id: "inventory", label: "انبار موجودی", icon: Store,
+    children: [
+      "لیست محصولات",
+      "افزودن محصول",
+      "دسته بندی",
+      "برند ها",
+      "ویژگی ها و متغیرها",
+    ],
+  },
   { id: "orders", label: "فروش و سفارشات", icon: ShoppingBag },
   { id: "marketing", label: "بازاریابی و تخفیف", icon: BadgePercent },
   { id: "customers", label: "مشتریان و پشتیبانی", icon: UserRound },
@@ -55,7 +64,25 @@ export function AdminSidebar({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { data: session } = useSession();
+  const logout = useSignOut();
   const [expandedItem, setExpandedItem] = useState<string | null>("products");
+  const displayName = [session?.user.name, session?.user.family]
+    .filter(Boolean)
+    .join(" ") || "مدیر";
+  const avatarInitial = displayName.trim().charAt(0) || "م";
+
+  function handleLogout() {
+    if (logout.isPending) return;
+
+    logout.mutate(undefined, {
+      onSuccess: () => {
+        onClose();
+        router.replace(AUTH_ROUTES.admin.login);
+        router.refresh();
+      },
+    });
+  }
 
   return (
     <aside
@@ -105,43 +132,62 @@ export function AdminSidebar({
             return (
               <div key={item.id}>
                 <Button
-                  aria-expanded={isExpanded}
+                  aria-controls={item.children ? `sidebar-submenu-${item.id}` : undefined}
+                  aria-expanded={item.children ? isExpanded : undefined}
                   className={`flex h-[47px] w-full cursor-pointer items-center rounded-xl px-3 text-right transition-colors ${isExpanded
-                      ? "bg-primary-50 text-zinc-900 shadow-[0_8px_14px_rgba(0,0,0,0.2)]"
-                      : "text-white hover:bg-white/10"
+                    ? "bg-primary-50 text-zinc-900 shadow-[0_8px_14px_rgba(0,0,0,0.2)]"
+                    : "text-white hover:bg-white/10"
                     }`}
-                  onClick={() => setExpandedItem(isExpanded ? null : item.id)}
+                  onClick={() => {
+                    if (item.children) {
+                      setExpandedItem(isExpanded ? null : item.id);
+                    }
+                  }}
                   type="button"
                   variant="ghost"
                 >
                   <Icon size={23} strokeWidth={1.55} />
                   <span className="mr-3 flex-1 text-[15px] font-bold">{item.label}</span>
-                  {isExpanded ? (
-                    <ChevronUp size={22} strokeWidth={1.5} />
-                  ) : (
-                    <ChevronDown size={22} strokeWidth={1.5} />
-                  )}
+                  {item.children ? (
+                    <ChevronDown
+                      className={`transition-transform duration-300 ${isExpanded ? "rotate-180" : "rotate-0"}`}
+                      size={22}
+                      strokeWidth={1.5}
+                    />
+                  ) : null}
                 </Button>
 
-                {isExpanded && item.children ? (
-                  <div className="mx-2 mt-5 rounded-xl bg-white px-5 py-2 text-zinc-800 shadow-sm">
-                    {item.children.map((child) => (
-                      <Button
-                        className={`block h-[44px] w-full cursor-pointer text-right text-[13px] transition-colors hover:text-primary-500 ${child === "لیست محصولات" && pathname.startsWith("/admin/products")
-                            ? "bg-zinc-100 font-semibold text-primary-500"
-                            : ""
-                          }`}
-                        key={child}
-                        onClick={() => {
-                          if (child === "لیست محصولات") router.push("/admin/products");
-                          onClose();
-                        }}
-                        type="button"
-                        variant="ghost"
-                      >
-                        {child}
-                      </Button>
-                    ))}
+                {item.children ? (
+                  <div
+                    aria-hidden={!isExpanded}
+                    className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isExpanded
+                      ? "grid-rows-[1fr] opacity-100"
+                      : "grid-rows-[0fr] opacity-0"
+                      }`}
+                    id={`sidebar-submenu-${item.id}`}
+                    inert={!isExpanded}
+                  >
+                    <div className="min-h-0 overflow-hidden">
+                      <div className="mx-2 mt-5 rounded-xl bg-white px-2 py-2 text-zinc-800 shadow-sm">
+                        {item.children.map((child) => (
+                          <Button
+                            className={`block h-[44px] w-full cursor-pointer text-right text-[13px] transition-colors hover:text-primary-500 ${child === "لیست محصولات" && pathname.startsWith("/admin/products")
+                              ? "bg-zinc-100 font-semibold text-primary-500"
+                              : ""
+                              }`}
+                            key={child}
+                            onClick={() => {
+                              if (child === "لیست محصولات") router.push("/admin/products");
+                              onClose();
+                            }}
+                            type="button"
+                            variant="ghost"
+                          >
+                            {child}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 ) : null}
               </div>
@@ -152,13 +198,28 @@ export function AdminSidebar({
 
       <footer className="mt-5 shrink-0 border-t border-white/65 pt-4">
         <div className="flex items-center gap-3">
-          <div className="flex size-8 items-center justify-center rounded-full bg-white/10 text-[10px]">م</div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium">مدیر ارشد</p>
-            <p className="mt-0.5 text-[9px] text-white/70" dir="ltr">0912 123 1214</p>
+          <div className="flex size-8 items-center justify-center rounded-full bg-white/10 text-[10px]">
+            {avatarInitial}
           </div>
-          <Button aria-label="خروج از حساب" className="cursor-pointer text-white/90 hover:text-white" size="icon" type="button" variant="ghost">
-            <LogOut size={22} strokeWidth={1.5} />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium">{displayName}</p>
+            {/* <p className="mt-0.5 text-[9px] text-white/70" dir="ltr">شماره تماس کاربر</p> */}
+          </div>
+          <Button
+            aria-label={logout.isPending ? "در حال خروج" : "خروج از حساب"}
+            className="cursor-pointer text-white/90 hover:text-gray-800 disabled:cursor-wait disabled:opacity-60"
+            disabled={logout.isPending}
+            onClick={handleLogout}
+            size="icon"
+            title={logout.isPending ? "در حال خروج..." : "خروج از حساب"}
+            type="button"
+            variant="ghost"
+          >
+            <LogOut
+              className={logout.isPending ? "animate-pulse" : undefined}
+              size={22}
+              strokeWidth={1.5}
+            />
           </Button>
         </div>
       </footer>
