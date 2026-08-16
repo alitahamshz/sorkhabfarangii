@@ -103,26 +103,16 @@ function AdminLoginForm({ audience }: { audience: AuthAudience }) {
   const router = useRouter();
   const loginTitle = audience === "admin" ? "ورود به سایت" : audienceContent[audience].title;
   const [value, setValue] = useState("");
-  const [touched, setTouched] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
   const [dark, setDark] = useState(false);
   const [requestError, setRequestError] = useState("");
   const { isPending: isSendingOtp, mutate: sendOtp } = useSendAdminOtp();
 
   const normalizedValue = normalizeDigits(value);
   const isValid = /^09\d{9}$/.test(normalizedValue);
-  const hasInvalidPrefix =
-    normalizedValue.length > 0 && !"09".startsWith(normalizedValue);
-  const isInvalid =
-    !isValid &&
-    (submitted ||
-      hasInvalidPrefix ||
-      (touched && normalizedValue.length > 0) ||
-      normalizedValue.length === 11);
+  const isInvalid = normalizedValue.length === 11 && !isValid;
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitted(true);
 
     if (!isValid) return;
 
@@ -219,10 +209,8 @@ function AdminLoginForm({ audience }: { audience: AuthAudience }) {
               inputMode="numeric"
               maxLength={13}
               name="phone"
-              onBlur={() => setTouched(true)}
               onChange={(event) => {
                 setValue(formatPhoneNumber(event.target.value));
-                setSubmitted(false);
               }}
               placeholder="09-- --- ----"
               type="tel"
@@ -246,22 +234,29 @@ function AdminLoginForm({ audience }: { audience: AuthAudience }) {
           {requestError ? <p className="mt-1.5 text-xs text-red-600">{requestError}</p> : null}
 
           <Button
+            aria-label={isSendingOtp ? "در حال ارسال کد" : undefined}
             className="mt-12 h-12 w-full rounded-lg bg-primary-500 text-[14px] font-medium text-white transition enabled:cursor-pointer enabled:hover:bg-primary-600 enabled:active:scale-[0.995] disabled:cursor-not-allowed disabled:bg-primary-200"
             disabled={!isValid || isSendingOtp}
             size="lg"
             type="submit"
           >
-            {isSendingOtp ? "در حال ارسال کد..." : "ورود"}
+            {isSendingOtp ? (
+              <Image alt="" aria-hidden height={24} src="/icon/loading.svg" width={24} />
+            ) : (
+              "دریافت کد یکبار مصرف"
+            )}
           </Button>
         </form>
 
-        <p className={`mt-6 text-center text-[10px] ${dark ? "text-neutral-400" : "text-neutral-400"}`}>
-          ورود به منزله پذیرش{" "}
-          <Link className="text-primary-500 underline underline-offset-2" href="/privacy">
-قوانین حریم خصوصی {"  "}
-          </Link>
-          است.
-        </p>
+        {audience !== "admin" ? (
+          <p className={`mt-6 text-center text-[10px] ${dark ? "text-neutral-400" : "text-neutral-400"}`}>
+            ورود به منزله پذیرش{" "}
+            <Link className="text-primary-500 underline underline-offset-2" href="/privacy">
+              قوانین حریم خصوصی{"  "}
+            </Link>
+            است.
+          </p>
+        ) : null}
       </section>
     </main>
   );
@@ -452,13 +447,15 @@ function AdminOtpForm({ audience }: { audience: AuthAudience }) {
           </Button>
         </form>
 
-        <p className={`mt-6 text-center text-[10px] ${dark ? "text-neutral-400" : "text-neutral-400"}`}>
-          ورود به منزله پذیرش{" "}
-          <Link className="text-primary-500 underline underline-offset-2" href="/privacy">
-            قوانین حریم خصوصی
-          </Link>
-          است.
-        </p>
+        {audience !== "admin" ? (
+          <p className={`mt-6 text-center text-[10px] ${dark ? "text-neutral-400" : "text-neutral-400"}`}>
+            ورود به منزله پذیرش{" "}
+            <Link className="text-primary-500 underline underline-offset-2" href="/privacy">
+              قوانین حریم خصوصی
+            </Link>
+            است.
+          </p>
+        ) : null}
       </section>
     </main>
   );
