@@ -54,6 +54,14 @@ function normalizeDigits(value: string) {
     .replace(/\D/g, "");
 }
 
+function formatPhoneNumber(value: string) {
+  const digits = normalizeDigits(value).slice(0, 11);
+
+  if (digits.length <= 4) return digits;
+  if (digits.length <= 7) return `${digits.slice(0, 4)} ${digits.slice(4)}`;
+  return `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7)}`;
+}
+
 function getAdminLoginErrorMessage(error: unknown) {
   const apiError = isApiError(error) ? error : undefined;
   const payload = apiError?.data ?? error;
@@ -91,8 +99,9 @@ function getAdminLoginErrorMessage(error: unknown) {
   return description || message || "ارسال کد تأیید با خطا مواجه شد. دوباره تلاش کنید.";
 }
 
-function AdminLoginForm() {
+function AdminLoginForm({ audience }: { audience: AuthAudience }) {
   const router = useRouter();
+  const loginTitle = audience === "admin" ? "ورود به سایت" : audienceContent[audience].title;
   const [value, setValue] = useState("");
   const [touched, setTouched] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -102,9 +111,14 @@ function AdminLoginForm() {
 
   const normalizedValue = normalizeDigits(value);
   const isValid = /^09\d{9}$/.test(normalizedValue);
+  const hasInvalidPrefix =
+    normalizedValue.length > 0 && !"09".startsWith(normalizedValue);
   const isInvalid =
     !isValid &&
-    (submitted || (touched && normalizedValue.length > 0) || normalizedValue.length === 11);
+    (submitted ||
+      hasInvalidPrefix ||
+      (touched && normalizedValue.length > 0) ||
+      normalizedValue.length === 11);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -122,8 +136,8 @@ function AdminLoginForm() {
             return;
           }
 
-          window.sessionStorage.setItem("admin_otp_phone_number", normalizedValue);
-          router.push(AUTH_ROUTES.admin.otp);
+          window.sessionStorage.setItem(`otp_phone_number_${audience}`, normalizedValue);
+          router.push(AUTH_ROUTES[audience].otp);
         },
         onError: (requestError) => {
           setRequestError(getAdminLoginErrorMessage(requestError));
@@ -139,7 +153,7 @@ function AdminLoginForm() {
       dir="rtl"
     >
       <section
-        className={`flex min-h-[480px] w-full max-w-[465px] flex-col rounded-2xl border px-8 pb-7 pt-8 shadow-[0_1px_2px_rgba(16,24,40,0.04)] transition-colors max-[480px]:min-h-dvh max-[480px]:max-w-none max-[480px]:rounded-none max-[480px]:border-0 max-[480px]:px-4 max-[480px]:shadow-none ${dark
+        className={`flex w-full max-w-[465px] flex-col rounded-2xl border px-8 pb-7 pt-8 shadow-[0_1px_2px_rgba(16,24,40,0.04)] transition-colors max-[480px]:min-h-dvh max-[480px]:max-w-none max-[480px]:rounded-none max-[480px]:border-0 max-[480px]:px-4 max-[480px]:shadow-none ${dark
             ? "border-neutral-700 bg-neutral-800 text-white"
             : "border-neutral-300 bg-white text-neutral-900"
           }`}
@@ -168,7 +182,7 @@ function AdminLoginForm() {
 
         <div className="mt-10 flex items-center gap-2 text-[14px] font-medium">
           <Image src={'/icon/auth/login.svg'} width={18} height={18} alt="login" />
-          <h1>ورود به سایت</h1>
+          <h1>{loginTitle}</h1>
         </div>
 
         <form className="mt-8 flex flex-1 flex-col" noValidate onSubmit={handleSubmit}>
@@ -203,15 +217,14 @@ function AdminLoginForm() {
               dir="ltr"
               id="admin-login"
               inputMode="numeric"
-              maxLength={11}
+              maxLength={13}
               name="phone"
               onBlur={() => setTouched(true)}
               onChange={(event) => {
-                const nextValue = event.target.value.replace(/[^0-9۰-۹٠-٩]/g, "");
-                setValue(nextValue);
+                setValue(formatPhoneNumber(event.target.value));
                 setSubmitted(false);
               }}
-              placeholder="09XX XXX XXXX"
+              placeholder="09-- --- ----"
               type="tel"
               value={value}
             />
@@ -233,7 +246,7 @@ function AdminLoginForm() {
           {requestError ? <p className="mt-1.5 text-xs text-red-600">{requestError}</p> : null}
 
           <Button
-            className="mt-auto h-12 w-full rounded-lg bg-primary-500 text-[14px] font-medium text-white transition enabled:cursor-pointer enabled:hover:bg-primary-600 enabled:active:scale-[0.995] disabled:cursor-not-allowed disabled:bg-primary-200 max-[480px]:mt-[42px]"
+            className="mt-12 h-12 w-full rounded-lg bg-primary-500 text-[14px] font-medium text-white transition enabled:cursor-pointer enabled:hover:bg-primary-600 enabled:active:scale-[0.995] disabled:cursor-not-allowed disabled:bg-primary-200"
             disabled={!isValid || isSendingOtp}
             size="lg"
             type="submit"
@@ -255,7 +268,7 @@ function AdminLoginForm() {
 }
 
 // ==================== شروع بخش OTP ادمین ====================
-function AdminOtpForm() {
+function AdminOtpForm({ audience }: { audience: AuthAudience }) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const lastAutoSubmittedOtpRef = useRef("");
@@ -265,7 +278,7 @@ function AdminOtpForm() {
   const [phoneNumber] = useState(() =>
     typeof window === "undefined"
       ? ""
-      : (window.sessionStorage.getItem("admin_otp_phone_number") ?? ""),
+      : (window.sessionStorage.getItem(`otp_phone_number_${audience}`) ?? ""),
   );
   const [error, setError] = useState("");
   const isComplete = otp.length === 5;
@@ -277,11 +290,11 @@ function AdminOtpForm() {
   useEffect(() => {
     if (!success) return;
     const timer = window.setTimeout(
-      () => router.push(AUTH_ROUTES.admin.destination),
+      () => router.push(AUTH_ROUTES[audience].destination),
       1100,
     );
     return () => window.clearTimeout(timer);
-  }, [router, success]);
+  }, [audience, router, success]);
 
   useEffect(() => {
     if (!isComplete || isVerifying || success) return;
@@ -341,7 +354,7 @@ function AdminOtpForm() {
     >
       <SuccessMessage visible={success} />
       <section
-        className={`flex min-h-[480px] w-full max-w-[465px] flex-col rounded-2xl border px-8 pb-7 pt-8 shadow-[0_1px_2px_rgba(16,24,40,0.04)] transition-colors max-[480px]:min-h-dvh max-[480px]:max-w-none max-[480px]:rounded-none max-[480px]:border-0 max-[480px]:px-4 max-[480px]:shadow-none ${dark
+        className={`flex w-full max-w-[465px] flex-col rounded-2xl border px-8 pb-7 pt-8 shadow-[0_1px_2px_rgba(16,24,40,0.04)] transition-colors max-[480px]:min-h-dvh max-[480px]:max-w-none max-[480px]:rounded-none max-[480px]:border-0 max-[480px]:px-4 max-[480px]:shadow-none ${dark
             ? "border-neutral-700 bg-neutral-800 text-white"
             : "border-neutral-300 bg-white text-neutral-900"
           }`}
@@ -416,7 +429,7 @@ function AdminOtpForm() {
 
           {/* ویرایش شماره و ارسال مجدد کد OTP */}
           <div className="mt-3 flex items-center justify-between text-[11px]">
-            <Link className="text-primary-500 underline underline-offset-2" href={AUTH_ROUTES.admin.login}>
+            <Link className="text-primary-500 underline underline-offset-2" href={AUTH_ROUTES[audience].login}>
               ویرایش شماره موبایل
             </Link>
             <Button
@@ -568,7 +581,7 @@ function DefaultAuthForm({ audience, step }: { audience: AuthAudience; step: Aut
 }
 
 export function AuthFlowForm({ audience, step }: { audience: AuthAudience; step: AuthStep }) {
-  if (audience === "admin" && step === "login") return <AdminLoginForm />;
-  if (audience === "admin" && step === "otp") return <AdminOtpForm />;
+  if (step === "login") return <AdminLoginForm audience={audience} />;
+  if (step === "otp") return <AdminOtpForm audience={audience} />;
   return <DefaultAuthForm audience={audience} step={step} />;
 }

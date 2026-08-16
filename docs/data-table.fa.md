@@ -12,6 +12,7 @@
 - پشتیبانی از شناسه پایدار برای حفظ انتخاب رکوردها
 - جدول افقی scrollable در عرض‌های کوچک
 - امکان غیرفعال‌کردن انتخاب برای همه یا بعضی ردیف‌ها
+- امکان نمایش محتوای بازشونده یا یک جدول داخلی برای هر ردیف
 
 ## استفاده پایه
 
@@ -113,6 +114,49 @@ const columns: ColumnDef<User, unknown>[] = [
 ];
 ```
 
+## ردیف بازشونده و جدول داخلی
+
+برای اضافه‌کردن زیرجدول فقط مشخص کنید کدام ردیف قابل بازشدن است و هنگام بازشدن چه چیزی نمایش داده شود. وضعیت باز و بسته‌شدن داخل `DataTable` مدیریت می‌شود و دکمه کنترل آن می‌تواند در هر ستون دلخواه قرار بگیرد:
+
+```tsx
+const columns: ColumnDef<Category, unknown>[] = [
+  {
+    id: "children",
+    header: "زیر دسته",
+    cell: ({ row }) => (
+      <button
+        disabled={!row.getCanExpand()}
+        onClick={row.getToggleExpandedHandler()}
+        type="button"
+      >
+        {row.original.children.length} مورد
+      </button>
+    ),
+  },
+];
+
+<DataTable
+  ariaLabel="دسته‌بندی‌ها"
+  columns={columns}
+  data={categories}
+  enableRowSelection={false}
+  getRowCanExpand={(category) => category.children.length > 0}
+  getRowId={(category) => category.id}
+  renderExpandedRow={(category) => (
+    <DataTable
+      ariaLabel={`زیر دسته‌های ${category.name}`}
+      columns={columns}
+      data={category.children}
+      enableRowSelection={false}
+      getRowId={(child) => child.id}
+      showFooter={false}
+    />
+  )}
+/>
+```
+
+هر جدول داخلی مستقل است؛ در نتیجه ستون عملیات آن می‌تواند مشاهده، ویرایش، حذف یا هر اکشن دیگری داشته باشد. در صورت نیاز همین الگو را می‌توان به‌صورت بازگشتی برای چند سطح تکرار کرد.
+
 ## API کامپوننت
 
 | prop | نوع | توضیح |
@@ -122,8 +166,12 @@ const columns: ColumnDef<User, unknown>[] = [
 | `data` | `TData[]` | داده فعلی جدول؛ اجباری |
 | `getRowId` | `(row: TData) => string` | تولید شناسه پایدار؛ اجباری |
 | `bulkActions` | `DataTableBulkAction<TData>[]` | عملیات نمایش‌داده‌شده بعد از انتخاب |
+| `className` | `string` | کلاس تکمیلی برای قاب اصلی جدول |
 | `enableRowSelection` | `boolean \| (row) => boolean` | فعال یا شرطی‌کردن انتخاب؛ پیش‌فرض `true` |
+| `getRowCanExpand` | `(row) => boolean` | تعیین ردیف‌های قابل بازشدن |
 | `pageSize` | `number` | تعداد رکورد هر صفحه؛ پیش‌فرض `8` |
+| `renderExpandedRow` | `(row) => ReactNode` | محتوای زیر ردیف بازشده |
+| `showFooter` | `boolean` | نمایش خلاصه و صفحه‌بندی؛ پیش‌فرض `true` |
 | `emptyMessage` | `string` | پیام حالت بدون داده |
 | `tableClassName` | `string` | کلاس تکمیلی برای عنصر table |
 

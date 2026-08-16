@@ -64,15 +64,24 @@ Server Component → serverApi → Backend API
 
 این روش امکان استفاده از قابلیت‌های `revalidate` و `tags` در Next.js را حفظ می‌کند و round trip اضافه از Route Handler داخلی ایجاد نمی‌کند.
 
+`serverApi` در هر درخواست نشست امن را بررسی می‌کند و اگر access token وجود داشته باشد، هدر زیر را به‌صورت خودکار اضافه می‌کند:
+
+```http
+Authorization: Bearer <access-token>
+```
+
+نیازی به خواندن یا ارسال دستی token در endpointهای feature نیست. اگر یک درخواست عمداً هدر `Authorization` اختصاصی داشته باشد، مقدار همان درخواست بر مقدار خودکار اولویت دارد.
+برای جلوگیری از افشای token، مقدار خودکار فقط به آدرس اصلی تنظیم‌شده برای همان API client اضافه می‌شود و به URL مطلق با origin متفاوت ارسال نخواهد شد.
+
 ### Client Component
 
 Client Component از TanStack Query و `clientApi` استفاده می‌کند:
 
 ```text
-Client Component → TanStack Query → clientApi → /api/* → Backend API
+Client Component → TanStack Query → clientApi → Backend API
 ```
 
-مسیر پیش‌فرض `clientApi` برابر `/api` است. در فاز دوم، Route Handlerهای Next.js نقش BFF را خواهند داشت و cookie امن را مدیریت می‌کنند.
+مسیر `clientApi` از `NEXT_PUBLIC_API_BASE_URL` خوانده می‌شود و درخواست را مستقیماً به بک‌اند می‌فرستد. access token از cookie خوانده می‌شود و `clientApi` آن را به‌صورت خودکار در هدر `Authorization` قرار می‌دهد؛ بنابراین استفاده از Route Handlerهای Next.js برای همه endpointهای محافظت‌شده الزامی نیست.
 
 ## متغیرهای محیطی
 
@@ -84,7 +93,7 @@ API_BASE_URL=https://sorkhabfarangi.shop/api/v1
 
 `API_BASE_URL` فقط روی سرور قابل استفاده است و نباید پیشوند `NEXT_PUBLIC_` داشته باشد.
 
-`NEXT_PUBLIC_API_BASE_URL` اختیاری است و فقط برای API کاملاً عمومی کاربرد دارد. برای احراز هویت، مرورگر باید از `/api` خود Next.js استفاده کند.
+`NEXT_PUBLIC_API_BASE_URL` آدرس API مورد استفاده مستقیم مرورگر است. بک‌اند باید origin فرانت‌اند و هدر `Authorization` را در تنظیمات CORS مجاز کرده باشد.
 
 ## تعریف endpoint سروری
 
@@ -283,9 +292,10 @@ Return sanitized user/session to browser
 
 اصول پیاده‌سازی:
 
-- token داخل `localStorage` یا state کلاینت ذخیره نمی‌شود.
-- token از Route Handler به JavaScript مرورگر برگردانده نمی‌شود.
-- cookie با گزینه‌های `httpOnly`، `secure` و `sameSite` مناسب ذخیره می‌شود.
+- token در `localStorage` یا state کلاینت ذخیره نمی‌شود.
+- cookie مربوط به access token برای ساخت هدر درخواست مستقیم در کلاینت قابل‌خواندن است؛ cookie امضاشده session همچنان `HttpOnly` باقی می‌ماند.
+- `serverApi` توکن موجود در cookie امن را در هدر `Authorization: Bearer ...` درخواست‌های بک‌اند قرار می‌دهد.
+- `clientApi` توکن مرورگر را در هدر `Authorization: Bearer ...` درخواست‌های مستقیم بک‌اند قرار می‌دهد.
 - endpointی مانند `/api/auth/session` اطلاعات امن و خلاصه کاربر را برمی‌گرداند.
 - وضعیت user/session با query مشخصی مانند `["auth", "session"]` مدیریت می‌شود.
 - logout کوکی‌ها را روی سرور پاک و query مربوط به session را به `null` تغییر می‌دهد.

@@ -22,7 +22,7 @@ type SidebarItem = {
   id: string;
   label: string;
   icon: LucideIcon;
-  children?: string[];
+  children?: { label: string; href?: string }[];
 };
 
 const sidebarItems: SidebarItem[] = [
@@ -31,21 +31,21 @@ const sidebarItems: SidebarItem[] = [
     label: "محصولات",
     icon: Box,
     children: [
-      "لیست محصولات",
-      "افزودن محصول",
-      "دسته بندی",
-      "برند ها",
-      "ویژگی ها و متغیرها",
+      { label: "لیست محصولات", href: "/admin/products" },
+      { label: "افزودن محصول" },
+      { label: "دسته بندی", href: "/admin/products/categories" },
+      { label: "برند ها", href: "/admin/products/brands" },
+      { label: "ویژگی ها و متغیرها" },
     ],
   },
   {
     id: "inventory", label: "انبار موجودی", icon: Store,
     children: [
-      "لیست محصولات",
-      "افزودن محصول",
-      "دسته بندی",
-      "برند ها",
-      "ویژگی ها و متغیرها",
+      { label: "لیست محصولات" },
+      { label: "افزودن محصول" },
+      { label: "دسته بندی" },
+      { label: "برند ها" },
+      { label: "ویژگی ها و متغیرها" },
     ],
   },
   { id: "orders", label: "فروش و سفارشات", icon: ShoppingBag },
@@ -169,23 +169,29 @@ export function AdminSidebar({
                   >
                     <div className="min-h-0 overflow-hidden">
                       <div className="mx-2 mt-5 rounded-xl bg-white px-2 py-2 text-zinc-800 shadow-sm">
-                        {item.children.map((child) => (
-                          <Button
-                            className={`block h-[44px] w-full cursor-pointer text-right text-[13px] transition-colors hover:text-primary-500 ${child === "لیست محصولات" && pathname.startsWith("/admin/products")
-                              ? "bg-zinc-100 font-semibold text-primary-500"
-                              : ""
-                              }`}
-                            key={child}
-                            onClick={() => {
-                              if (child === "لیست محصولات") router.push("/admin/products");
-                              onClose();
-                            }}
-                            type="button"
-                            variant="ghost"
-                          >
-                            {child}
-                          </Button>
-                        ))}
+                        {item.children.map((child) => {
+                          const isActive = child.href
+                            ? pathname === child.href
+                            : false;
+
+                          return (
+                            <Button
+                              className={`block h-[44px] w-full cursor-pointer text-right text-[13px] transition-colors hover:text-primary-500 ${isActive
+                                ? "bg-zinc-100 font-semibold text-primary-500"
+                                : ""
+                                }`}
+                              key={child.label}
+                              onClick={() => {
+                                if (child.href) router.push(child.href);
+                                onClose();
+                              }}
+                              type="button"
+                              variant="ghost"
+                            >
+                              {child.label}
+                            </Button>
+                          );
+                        })}
                       </div>
                     </div>
                   </div>

@@ -60,5 +60,6 @@ export type ApiClientConfig = {
   baseUrl: string | (() => string);
   credentials?: RequestCredentials;
   defaultHeaders?: HeadersInit | (() => HeadersInit | Promise<HeadersInit>);
+  getAccessToken?: () => string | null | undefined | Promise<string | null | undefined>;
   timeoutMs?: number;
 };

@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { Fragment, useMemo, useState, type ReactNode } from "react";
 import {
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
   useReactTable,
   type ColumnDef,
+  type ExpandedState,
   type Row,
   type RowSelectionState,
 } from "@tanstack/react-table";
@@ -41,24 +42,33 @@ type DataTableProps<TData> = {
   data: TData[];
   getRowId: (row: TData) => string;
   bulkActions?: DataTableBulkAction<TData>[];
+  className?: string;
   emptyMessage?: string;
   enableRowSelection?: boolean | ((row: Row<TData>) => boolean);
+  getRowCanExpand?: (row: TData) => boolean;
   pageSize?: number;
+  renderExpandedRow?: (row: TData) => ReactNode;
+  showFooter?: boolean;
   tableClassName?: string;
 };
 
 export function DataTable<TData>({
   ariaLabel,
   bulkActions = [],
+  className,
   columns,
   data,
   emptyMessage = "رکوردی برای نمایش وجود ندارد.",
   enableRowSelection = true,
   getRowId,
+  getRowCanExpand,
   pageSize = 8,
+  renderExpandedRow,
+  showFooter = true,
   tableClassName,
 }: DataTableProps<TData>) {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [expanded, setExpanded] = useState<ExpandedState>({});
 
   const selectionColumn = useMemo<ColumnDef<TData, unknown>>(
     () => ({
@@ -103,10 +113,14 @@ export function DataTable<TData>({
     enableRowSelection,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getRowCanExpand: getRowCanExpand
+      ? (row) => getRowCanExpand(row.original)
+      : undefined,
     getRowId,
     initialState: { pagination: { pageIndex: 0, pageSize } },
+    onExpandedChange: setExpanded,
     onRowSelectionChange: setRowSelection,
-    state: { rowSelection },
+    state: { expanded, rowSelection },
   });
 
   const selectedRows = table.getSelectedRowModel().rows.map((row) => row.original);
@@ -117,7 +131,10 @@ export function DataTable<TData>({
   const pageCount = table.getPageCount();
 
   return (
-    <section aria-label={ariaLabel} className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
+    <section
+      aria-label={ariaLabel}
+      className={cn("overflow-hidden rounded-2xl border border-zinc-200 bg-white", className)}
+    >
       {selectedCount > 0 ? (
         <div className="flex min-h-14 flex-wrap items-center justify-between gap-3 border-b border-primary-100 bg-primary-50/70 px-4 py-2">
           <div className="flex items-center gap-2 text-sm font-medium text-primary-700">
@@ -173,22 +190,30 @@ export function DataTable<TData>({
         <TableBody>
           {table.getRowModel().rows.length ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow
-                data-state={row.getIsSelected() ? "selected" : undefined}
-                key={row.id}
-              >
-                {row.getVisibleCells().map((cell) => {
-                  const meta = cell.column.columnDef.meta as DataTableColumnMeta | undefined;
-                  return (
-                    <TableCell
-                      className={cn("h-[70px] px-3 text-xs text-zinc-700", meta?.cellClassName)}
-                      key={cell.id}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              <Fragment key={row.id}>
+                <TableRow
+                  data-state={row.getIsSelected() ? "selected" : undefined}
+                >
+                  {row.getVisibleCells().map((cell) => {
+                    const meta = cell.column.columnDef.meta as DataTableColumnMeta | undefined;
+                    return (
+                      <TableCell
+                        className={cn("h-[70px] px-3 text-xs text-zinc-700", meta?.cellClassName)}
+                        key={cell.id}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+                {row.getIsExpanded() && renderExpandedRow ? (
+                  <TableRow className="bg-zinc-50/80 hover:bg-zinc-50/80">
+                    <TableCell className="p-0 whitespace-normal" colSpan={row.getVisibleCells().length}>
+                      {renderExpandedRow(row.original)}
                     </TableCell>
-                  );
-                })}
-              </TableRow>
+                  </TableRow>
+                ) : null}
+              </Fragment>
             ))
           ) : (
             <TableRow className="hover:bg-white">
@@ -200,6 +225,7 @@ export function DataTable<TData>({
         </TableBody>
       </Table>
 
+      {showFooter ? (
       <footer className="flex min-h-12 flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2 text-xs text-zinc-500">
         <span>
           نمایش {firstVisibleRow.toLocaleString("fa-IR")} تا {lastVisibleRow.toLocaleString("fa-IR")} از {data.length.toLocaleString("fa-IR")} رکورد
@@ -244,6 +270,7 @@ export function DataTable<TData>({
           </nav>
         ) : null}
       </footer>
+      ) : null}
     </section>
   );
 }

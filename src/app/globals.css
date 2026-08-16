@@ -399,6 +399,38 @@ body {
   }
 }
 
+/* Base UI این attributeها را فقط هنگام ورود و خروج Popup اعمال می‌کند. */
+.sheet-slide-content {
+  will-change: transform;
+  transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sheet-slide-content[data-side="left"][data-starting-style],
+.sheet-slide-content[data-side="left"][data-ending-style] {
+  transform: translate3d(-100%, 0, 0);
+}
+
+.sheet-slide-content[data-side="right"][data-starting-style],
+.sheet-slide-content[data-side="right"][data-ending-style] {
+  transform: translate3d(100%, 0, 0);
+}
+
+.sheet-slide-content[data-side="top"][data-starting-style],
+.sheet-slide-content[data-side="top"][data-ending-style] {
+  transform: translate3d(0, -100%, 0);
+}
+
+.sheet-slide-content[data-side="bottom"][data-starting-style],
+.sheet-slide-content[data-side="bottom"][data-ending-style] {
+  transform: translate3d(0, 100%, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet-slide-content {
+    transition: none;
+  }
+}
+
 @layer utilities {
   .skeleton-shimmer {
     position: relative;

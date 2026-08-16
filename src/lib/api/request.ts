@@ -13,6 +13,15 @@ function joinUrl(baseUrl: string, path: string) {
   return `${baseUrl.replace(/\/$/, "")}/${path.replace(/^\//, "")}`;
 }
 
+function targetsConfiguredApi(path: string, baseUrl: string) {
+  if (!/^https?:\/\//i.test(path)) return true;
+  try {
+    return new URL(path).origin === new URL(baseUrl).origin;
+  } catch {
+    return false;
+  }
+}
+
 function addQueryParams(url: string, query?: QueryParams) {
   if (!query) return url;
 
@@ -98,6 +107,20 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         : config.defaultHeaders;
     const headers = new Headers(configuredHeaders);
     new Headers(requestHeaders).forEach((value, key) => headers.set(key, value));
+
+    if (
+      !headers.has("authorization") &&
+      config.getAccessToken &&
+      targetsConfiguredApi(path, baseUrl)
+    ) {
+      const accessToken = await config.getAccessToken();
+      if (accessToken) {
+        const authorizationValue = /^Bearer\s/i.test(accessToken)
+          ? accessToken
+          : `Bearer ${accessToken}`;
+        headers.set("authorization", authorizationValue);
+      }
+    }
 
     let requestBody: BodyInit | undefined;
     if (body !== undefined && body !== null) {

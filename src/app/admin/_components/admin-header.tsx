@@ -7,7 +7,15 @@ import { Button } from "@/components/ui/button";
 export function AdminHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
   const pathname = usePathname();
   const isProductsPage = pathname.startsWith("/admin/products");
-  const title = isProductsPage ? "لیست محصولات" : "نمای کلی";
+  const isCategoriesPage = pathname === "/admin/products/categories";
+  const isBrandsPage = pathname === "/admin/products/brands";
+  const title = isBrandsPage
+    ? "برندها"
+    : isCategoriesPage
+      ? "دسته‌بندی محصولات"
+      : isProductsPage
+        ? "لیست محصولات"
+        : "نمای کلی";
 
   return (
     <>

@@ -2,10 +2,9 @@ import "server-only";
 
 import { cookies } from "next/headers";
 import type { NextResponse } from "next/server";
+import { ACCESS_TOKEN_COOKIE, SESSION_COOKIE } from "../config/auth-cookies";
 import type { AuthSession, AuthUser, ServerAuthSession } from "../types/session";
 
-const ACCESS_TOKEN_COOKIE = "sf_access_token";
-const SESSION_COOKIE = "sf_session";
 const DEFAULT_SESSION_MAX_AGE = 7 * 24 * 60 * 60;
 
 type SignedSessionPayload = AuthSession & {
@@ -100,16 +99,24 @@ export async function setAuthCookies(
     ...toClientSession(session),
     tokenHash: await hashToken(session.accessToken),
   });
-  const cookieOptions = {
-    httpOnly: true,
+  const sharedCookieOptions = {
     maxAge,
     path: "/",
     sameSite: "lax" as const,
     secure: process.env.NODE_ENV === "production",
   };
 
-  response.cookies.set(ACCESS_TOKEN_COOKIE, session.accessToken, cookieOptions);
-  response.cookies.set(SESSION_COOKIE, signedSession, cookieOptions);
+  // برای ساخت Authorization در درخواست مستقیم مرورگر، access token باید
+  // از document.cookie قابل خواندن باشد. اعتبار نشست همچنان در cookie امضاشده
+  // و HttpOnly نگهداری و در سرور بررسی می‌شود.
+  response.cookies.set(ACCESS_TOKEN_COOKIE, session.accessToken, {
+    ...sharedCookieOptions,
+    httpOnly: false,
+  });
+  response.cookies.set(SESSION_COOKIE, signedSession, {
+    ...sharedCookieOptions,
+    httpOnly: true,
+  });
 }
 
 export function clearAuthCookies(response: NextResponse) {
