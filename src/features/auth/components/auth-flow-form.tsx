@@ -144,8 +144,8 @@ function AdminLoginForm({ audience }: { audience: AuthAudience }) {
     >
       <section
         className={`flex w-full max-w-[465px] flex-col rounded-2xl border px-8 pb-7 pt-8 shadow-[0_1px_2px_rgba(16,24,40,0.04)] transition-colors max-[480px]:min-h-dvh max-[480px]:max-w-none max-[480px]:rounded-none max-[480px]:border-0 max-[480px]:px-4 max-[480px]:shadow-none ${dark
-            ? "border-neutral-700 bg-neutral-800 text-white"
-            : "border-neutral-300 bg-white text-neutral-900"
+          ? "border-neutral-700 bg-neutral-800 text-white"
+          : "border-neutral-300 bg-white text-neutral-900"
           }`}
       >
         <div className="flex h-10 items-start justify-between">
@@ -199,10 +199,10 @@ function AdminLoginForm({ audience }: { audience: AuthAudience }) {
               autoComplete="tel"
               autoFocus
               className={`h-12 w-full rounded-lg border bg-transparent px-11 text-left text-[13px] outline-none transition placeholder:text-neutral-400 ${isInvalid
-                  ? "border-red-600 focus:ring-2 focus:ring-red-100"
-                  : dark
-                    ? "border-neutral-600 text-white focus:border-neutral-400 focus:ring-2 focus:ring-white/10 focus-visible:border-neutral-400 focus-visible:ring-white/10"
-                    : "border-neutral-200 text-neutral-600 focus:border-neutral-400 focus:ring-2 focus:ring-neutral-100 focus-visible:border-neutral-400 focus-visible:ring-neutral-100"
+                ? "border-red-600 focus:ring-2 focus:ring-red-100"
+                : dark
+                  ? "border-neutral-600 text-white focus:border-neutral-400 focus:ring-2 focus:ring-white/10 focus-visible:border-neutral-400 focus-visible:ring-white/10"
+                  : "border-neutral-200 text-neutral-600 focus:border-neutral-400 focus:ring-2 focus:ring-neutral-100 focus-visible:border-neutral-400 focus-visible:ring-neutral-100"
                 }`}
               dir="ltr"
               id="admin-login"
@@ -268,8 +268,9 @@ function AdminOtpForm({ audience }: { audience: AuthAudience }) {
   const formRef = useRef<HTMLFormElement>(null);
   const lastAutoSubmittedOtpRef = useRef("");
   const [otp, setOtp] = useState("");
-  const [dark, setDark] = useState(false);
+  const [dark] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [resendRemaining, setResendRemaining] = useState(153);
   const [phoneNumber] = useState(() =>
     typeof window === "undefined"
       ? ""
@@ -290,6 +291,16 @@ function AdminOtpForm({ audience }: { audience: AuthAudience }) {
     );
     return () => window.clearTimeout(timer);
   }, [audience, router, success]);
+
+  useEffect(() => {
+    if (resendRemaining === 0) return;
+
+    const timer = window.setInterval(() => {
+      setResendRemaining((remaining) => Math.max(remaining - 1, 0));
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [resendRemaining]);
 
   useEffect(() => {
     if (!isComplete || isVerifying || success) return;
@@ -332,10 +343,10 @@ function AdminOtpForm({ audience }: { audience: AuthAudience }) {
             console.error("[main_admin/otpVerify] request error:", requestError);
           }
           setError(
-          isApiError(requestError)
-            ? requestError.message
-            : "تأیید کد با خطا مواجه شد. دوباره تلاش کنید.",
-        );
+            isApiError(requestError)
+              ? requestError.message
+              : "تأیید کد با خطا مواجه شد. دوباره تلاش کنید.",
+          );
         },
       },
     );
@@ -350,8 +361,8 @@ function AdminOtpForm({ audience }: { audience: AuthAudience }) {
       <SuccessMessage visible={success} />
       <section
         className={`flex w-full max-w-[465px] flex-col rounded-2xl border px-8 pb-7 pt-8 shadow-[0_1px_2px_rgba(16,24,40,0.04)] transition-colors max-[480px]:min-h-dvh max-[480px]:max-w-none max-[480px]:rounded-none max-[480px]:border-0 max-[480px]:px-4 max-[480px]:shadow-none ${dark
-            ? "border-neutral-700 bg-neutral-800 text-white"
-            : "border-neutral-300 bg-white text-neutral-900"
+          ? "border-neutral-700 bg-neutral-800 text-white"
+          : "border-neutral-300 bg-white text-neutral-900"
           }`}
       >
         <div className="flex h-10 items-start justify-between">
@@ -363,7 +374,7 @@ function AdminOtpForm({ audience }: { audience: AuthAudience }) {
             src="/img/logo.svg"
             width={70}
           />
-          <Button
+          {/* <Button
             aria-label={dark ? "فعال‌کردن حالت روشن" : "فعال‌کردن حالت تیره"}
             className={`grid size-9 cursor-pointer place-items-center rounded-full transition-colors ${dark ? "text-yellow-300 hover:bg-white/10" : "text-neutral-500 hover:bg-neutral-100"
               }`}
@@ -373,26 +384,23 @@ function AdminOtpForm({ audience }: { audience: AuthAudience }) {
             variant="ghost"
           >
             {dark ? <Sun size={23} strokeWidth={1.7} /> : <Moon size={25} strokeWidth={1.7} />}
-          </Button>
+          </Button> */}
         </div>
 
-        <div className="mt-10 flex items-center gap-2 text-[14px] font-medium">
-          <Image src={'/icon/auth/login.svg'} alt="login" width={18} height={18} />
-          <h1>تأیید شماره موبایل</h1>
-        </div>
-
-        {/* فرم ورود کد پنج‌رقمی OTP */}
         <form
-          className="mt-8 flex flex-1 flex-col"
+          className="mt-[45px] flex flex-col"
           noValidate
           onSubmit={handleSubmit}
           ref={formRef}
         >
-          <p className={`mb-3 text-[14px] ${dark ? "text-neutral-300" : "text-neutral-500"}`}>
-            کد تأیید ۵ رقمی ارسال‌شده را وارد کنید
+          <p className={`mb-8 text-right text-[14px] ${dark ? "text-neutral-300" : "text-neutral-500"}`}>
+            کد تأیید برای شماره{" "}
+            <span className={dark ? "font-semibold text-white" : "font-semibold text-neutral-900"} dir="ltr">
+              {phoneNumber}
+            </span>{" "}
+            پیامک شد
           </p>
 
-          {/* پنج اینپوت مجزای کد OTP */}
           <div className="w-full" dir="ltr">
             <InputOTP
               autoComplete="one-time-code"
@@ -405,12 +413,12 @@ function AdminOtpForm({ audience }: { audience: AuthAudience }) {
               onChange={(value) => setOtp(normalizeDigits(value).slice(0, 5))}
               value={otp}
             >
-              <InputOTPGroup className="w-full flex-row justify-between gap-6" dir="ltr">
+              <InputOTPGroup className="w-full flex-row gap-2" dir="ltr">
                 {[0, 1, 2, 3, 4].map((index) => (
                   <InputOTPSlot
                     className={`h-12 w-10 min-w-0 flex-1 rounded-lg border text-xl font-medium first:rounded-lg first:border last:rounded-lg ${dark
-                      ? "border-neutral-600 bg-transparent text-white data-[active=true]:border-neutral-400 data-[active=true]:ring-white/10"
-                      : "border-neutral-200 bg-transparent text-neutral-600 data-[active=true]:border-neutral-400 data-[active=true]:ring-neutral-100"
+                      ? "border-neutral-600 bg-transparent text-white data-[filled=true]:border-neutral-500 data-[active=true]:border-neutral-400 data-[active=true]:ring-white/10"
+                      : "border-neutral-200 bg-transparent text-neutral-600 data-[filled=true]:border-neutral-300 data-[active=true]:border-neutral-400 data-[active=true]:ring-neutral-100"
                       }`}
                     index={index}
                     key={index}
@@ -422,29 +430,36 @@ function AdminOtpForm({ audience }: { audience: AuthAudience }) {
 
           {error ? <p className="mt-2 text-xs text-red-600">{error}</p> : null}
 
-          {/* ویرایش شماره و ارسال مجدد کد OTP */}
-          <div className="mt-3 flex items-center justify-between text-[11px]">
-            <Link className="text-primary-500 underline underline-offset-2" href={AUTH_ROUTES[audience].login}>
-              ویرایش شماره موبایل
-            </Link>
+          <p className={`mt-3 text-start text-[11px] ${dark ? "text-neutral-400" : "text-neutral-500"}`}>
+            {resendRemaining > 0
+              ? `${Math.floor(resendRemaining / 60)
+                .toString()
+                .padStart(2, "0")}:${(resendRemaining % 60)
+                  .toString()
+                  .padStart(2, "0")} مانده تا دریافت مجدد کد`
+              : "امکان دریافت مجدد کد فراهم است"}
+          </p>
+
+          <div className="mt-12 grid grid-cols-2 gap-2">
+
             <Button
-              className="h-auto cursor-pointer p-0 text-[11px] text-primary-500"
-              type="button"
-              variant="link"
+              className="h-12 rounded-lg bg-primary-500 text-[14px] font-medium text-white transition enabled:cursor-pointer enabled:hover:bg-primary-600 enabled:active:scale-[0.995] disabled:cursor-not-allowed disabled:bg-primary-200"
+              disabled={!isComplete || success || isVerifying}
+              size="lg"
+              type="submit"
             >
-              ارسال مجدد کد
+              {isVerifying ? "در حال تأیید..." : "ورود"}
+            </Button>
+            <Button
+              className="h-12 rounded-lg border-neutral-200 bg-transparent text-[14px] font-medium text-neutral-500 hover:bg-neutral-50"
+              onClick={() => router.push(AUTH_ROUTES[audience].login)}
+              size="lg"
+              type="button"
+              variant="outline"
+            >
+              تغییر شماره موبایل
             </Button>
           </div>
-
-          {/* دکمه تأیید OTP */}
-          <Button
-            className="mt-auto h-12 w-full rounded-lg bg-primary-500 text-[14px] font-medium text-white transition enabled:cursor-pointer enabled:hover:bg-primary-600 enabled:active:scale-[0.995] disabled:cursor-not-allowed disabled:bg-primary-200 max-[480px]:mt-[42px]"
-            disabled={!isComplete || success || isVerifying}
-            size="lg"
-            type="submit"
-          >
-            {isVerifying ? "در حال تأیید..." : "تأیید و ورود"}
-          </Button>
         </form>
 
         {audience !== "admin" ? (
