@@ -15,6 +15,7 @@ import {
   WalletCards,
 } from "lucide-react";
 import { useSession, useSignOut } from "@/features/auth";
+import { startGlobalNavigation } from "@/components/global-navigation-loader";
 import { BrandLogo } from "./brand-logo";
 
 type HeaderTopBarProps = {
@@ -120,6 +121,7 @@ function AccountActions({ mobile = false }: { mobile?: boolean }) {
               logout.mutate(undefined, {
                 onSuccess: () => {
                   setIsOpen(false);
+                  startGlobalNavigation();
                   router.push("/");
                   router.refresh();
                 },

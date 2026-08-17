@@ -20,6 +20,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { isApiError } from "@/lib/api";
+import { startGlobalNavigation } from "@/components/global-navigation-loader";
 import { useSendAdminOtp } from "../hooks/use-send-admin-otp";
 import { useVerifyAdminOtp } from "../hooks/use-verify-admin-otp";
 import { useWebOtp } from "../hooks/use-web-otp";
@@ -105,7 +106,7 @@ function AdminLoginForm({ audience }: { audience: AuthAudience }) {
   const [value, setValue] = useState("");
   const [dark, setDark] = useState(false);
   const [requestError, setRequestError] = useState("");
-  const { isPending: isSendingOtp, mutate: sendOtp } = useSendAdminOtp();
+  const { isPending: isSendingOtp, mutate: sendOtp } = useSendAdminOtp(audience);
 
   const normalizedValue = normalizeDigits(value);
   const isValid = /^09\d{9}$/.test(normalizedValue);
@@ -118,15 +119,16 @@ function AdminLoginForm({ audience }: { audience: AuthAudience }) {
 
     setRequestError("");
     sendOtp(
-      { phone_number: normalizedValue },
+      { mobile: normalizedValue },
       {
         onSuccess: (response) => {
-          if (response.success !== "true" || response.data.status === "false") {
+          if (!response.success) {
             setRequestError(getAdminLoginErrorMessage(response));
             return;
           }
 
           window.sessionStorage.setItem(`otp_phone_number_${audience}`, normalizedValue);
+          startGlobalNavigation();
           router.push(AUTH_ROUTES[audience].otp);
         },
         onError: (requestError) => {
@@ -277,16 +279,19 @@ function AdminOtpForm({ audience }: { audience: AuthAudience }) {
       : (window.sessionStorage.getItem(`otp_phone_number_${audience}`) ?? ""),
   );
   const [error, setError] = useState("");
-  const isComplete = otp.length === 5;
+  const isComplete = otp.length === 6;
 
-  const { isPending: isVerifying, mutate: verifyOtp } = useVerifyAdminOtp();
+  const { isPending: isVerifying, mutate: verifyOtp } = useVerifyAdminOtp(audience);
 
-  useWebOtp(setOtp, 5);
+  useWebOtp(setOtp, 6);
 
   useEffect(() => {
     if (!success) return;
     const timer = window.setTimeout(
-      () => router.push(AUTH_ROUTES[audience].destination),
+      () => {
+        startGlobalNavigation();
+        router.push(AUTH_ROUTES[audience].destination);
+      },
       1100,
     );
     return () => window.clearTimeout(timer);
@@ -321,13 +326,12 @@ function AdminOtpForm({ audience }: { audience: AuthAudience }) {
 
     setError("");
     verifyOtp(
-      { phone_number: phoneNumber, code: otp },
+      { mobile: phoneNumber, otp_code: otp },
       {
         onSuccess: (response) => {
-          console.log("[main_admin/otpVerify] raw backend response:", response);
-          if (response.success !== "true" || response.data.status === "false") {
+          if (!response.success) {
             setError(
-              response.data.discript || response.message || "کد تأیید نامعتبر است.",
+              response.message || "کد تأیید نامعتبر است.",
             );
             return;
           }
@@ -408,13 +412,13 @@ function AdminOtpForm({ audience }: { audience: AuthAudience }) {
               containerClassName="w-full [direction:ltr]"
               dir="ltr"
               inputMode="numeric"
-              maxLength={5}
+              maxLength={6}
               name="otp"
-              onChange={(value) => setOtp(normalizeDigits(value).slice(0, 5))}
+              onChange={(value) => setOtp(normalizeDigits(value).slice(0, 6))}
               value={otp}
             >
               <InputOTPGroup className="w-full flex-row gap-2" dir="ltr">
-                {[0, 1, 2, 3, 4].map((index) => (
+                {[0, 1, 2, 3, 4, 5].map((index) => (
                   <InputOTPSlot
                     className={`h-12 w-10 min-w-0 flex-1 rounded-lg border text-xl font-medium first:rounded-lg first:border last:rounded-lg ${dark
                       ? "border-neutral-600 bg-transparent text-white data-[filled=true]:border-neutral-500 data-[active=true]:border-neutral-400 data-[active=true]:ring-white/10"
@@ -452,7 +456,10 @@ function AdminOtpForm({ audience }: { audience: AuthAudience }) {
             </Button>
             <Button
               className="h-12 rounded-lg border-neutral-200 bg-transparent text-[14px] font-medium text-neutral-500 hover:bg-neutral-50"
-              onClick={() => router.push(AUTH_ROUTES[audience].login)}
+              onClick={() => {
+                startGlobalNavigation();
+                router.push(AUTH_ROUTES[audience].login);
+              }}
               size="lg"
               type="button"
               variant="outline"
@@ -505,7 +512,10 @@ function DefaultAuthForm({ audience, step }: { audience: AuthAudience; step: Aut
 
   useEffect(() => {
     if (!success) return;
-    const timer = window.setTimeout(() => router.push(routes.destination), 1100);
+    const timer = window.setTimeout(() => {
+      startGlobalNavigation();
+      router.push(routes.destination);
+    }, 1100);
     return () => window.clearTimeout(timer);
   }, [router, routes.destination, success]);
 
@@ -525,6 +535,7 @@ function DefaultAuthForm({ audience, step }: { audience: AuthAudience; step: Aut
 
     setError("");
     if (isLoginStep) {
+      startGlobalNavigation();
       router.push(routes.otp);
       return;
     }

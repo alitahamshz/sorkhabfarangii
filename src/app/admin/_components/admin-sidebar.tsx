@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { startGlobalNavigation } from "@/components/global-navigation-loader";
 import { AUTH_ROUTES, useSession, useSignOut } from "@/features/auth";
 
 type SidebarItem = {
@@ -78,6 +79,7 @@ export function AdminSidebar({
     logout.mutate(undefined, {
       onSuccess: () => {
         onClose();
+        startGlobalNavigation();
         router.replace(AUTH_ROUTES.admin.login);
         router.refresh();
       },
@@ -107,6 +109,7 @@ export function AdminSidebar({
         <Button
           className="flex h-11 w-full cursor-pointer items-center justify-start gap-3 px-3 text-right text-base font-semibold"
           onClick={() => {
+            startGlobalNavigation();
             router.push("/admin");
             onClose();
           }}
@@ -182,7 +185,10 @@ export function AdminSidebar({
                                 }`}
                               key={child.label}
                               onClick={() => {
-                                if (child.href) router.push(child.href);
+                                if (child.href) {
+                                  startGlobalNavigation();
+                                  router.push(child.href);
+                                }
                                 onClose();
                               }}
                               type="button"

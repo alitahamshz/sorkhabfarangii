@@ -1,33 +1,34 @@
-import { createApiClient, type ApiResponse } from "@/lib/api";
+import { createApiClient } from "@/lib/api";
+import type { AuthAudience } from "../config/auth-routes";
 
-export type VerifyAdminOtpInput = {
-  /** شماره موبایل ۱۱ رقمی؛ به‌صورت string برای حفظ صفر ابتدایی. */
-  phone_number: string;
-  /** کد تأیید پنج‌رقمی. */
-  code: string;
+export type VerifyOtpInput = { mobile: string; otp_code: string };
+export type VerifyOtpResponse = {
+  success: boolean;
+  message: string;
+  data: {
+    token: string;
+    user: {
+      id: string | number;
+      first_name: string | null;
+      last_name: string | null;
+      mobile: string;
+      gender: string | null;
+      profile_picture: string | null;
+      is_personal: boolean;
+      company_name: string | null;
+      roles: unknown[];
+    };
+  };
 };
-
-export type AdminOtpVerificationData = {
-  status: string;
-  name: string;
-  family: string;
-  discript: string;
-  level: string;
-  opt: string;
-  id: string | number;
-  token: string;
-};
-
-export type AdminOtpVerification = ApiResponse<AdminOtpVerificationData>;
 
 const nextApi = createApiClient({
   baseUrl: "/api",
   credentials: "include",
 });
 
-export function verifyAdminOtp(input: VerifyAdminOtpInput) {
-  return nextApi.post<AdminOtpVerification, VerifyAdminOtpInput>(
-    "/auth/admin/verify-otp",
+export function verifyOtp(audience: AuthAudience, input: VerifyOtpInput) {
+  return nextApi.post<VerifyOtpResponse, VerifyOtpInput>(
+    `/auth/${audience}/verify-otp`,
     input,
   );
 }

@@ -21,7 +21,6 @@ type AuthSession = {
     id: string;
     name: string;
     family: string;
-    level: string;
     audience: "admin" | "customer" | "seller";
   };
   expires: string;
