@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { GlobalNavigationLoader } from "@/components/global-navigation-loader";
 import { Providers } from "./providers";
 import "./globals.css";
@@ -13,7 +14,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="fa" dir="rtl" className="font-sans">
       <body>
         <Providers>
-          <GlobalNavigationLoader />
+          <Suspense fallback={null}>
+            <GlobalNavigationLoader />
+          </Suspense>
           {children}
         </Providers>
       </body>
