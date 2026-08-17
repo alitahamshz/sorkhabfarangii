@@ -11,7 +11,7 @@ export function SessionPreview({ session }: { session: ServerAuthSession }) {
     ["شناسه کاربر", session.user.id || "—"],
     ["نام", session.user.name || "—"],
     ["نام خانوادگی", session.user.family || "—"],
-    ["سطح دسترسی", session.user.level || "—"],
+    // ["سطح دسترسی", session.user.level || "—"],
     ["نوع حساب", session.user.audience],
     ["انقضای نشست", new Date(session.expires).toLocaleString("fa-IR")],
   ];
