@@ -84,16 +84,20 @@ export function GlobalNavigationLoader() {
     return () => window.clearTimeout(timeout);
   }, [isNavigating]);
 
-  if (!isNavigating) return null;
-
   return (
     <div
-      aria-busy="true"
+      aria-busy={isNavigating}
       aria-live="polite"
-      className="fixed inset-0 z-[110] grid place-items-center bg-background/80 p-6 backdrop-blur-sm"
+      className={`fixed inset-0 z-[110] grid place-items-center bg-background/30 p-6 transition-[opacity,backdrop-filter] duration-300 ease-out motion-reduce:transition-none ${
+        isNavigating ? "opacity-100 backdrop-blur-[2px]" : "pointer-events-none opacity-0 backdrop-blur-none"
+      }`}
       role="status"
     >
-      <div className="flex flex-col items-center gap-4 text-primary-500">
+      <div
+        className={`flex flex-col items-center gap-4 text-primary-500 transition-[opacity,transform] duration-300 ease-out motion-reduce:transition-none ${
+          isNavigating ? "translate-y-0 scale-100 opacity-100" : "translate-y-2 scale-95 opacity-0"
+        }`}
+      >
         <span className="relative grid size-14 place-items-center rounded-full border-4 border-primary-100">
           <span className="size-10 animate-spin rounded-full border-4 border-primary-500 border-t-transparent" />
         </span>
