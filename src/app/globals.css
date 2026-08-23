@@ -393,6 +393,33 @@ body {
   }
 }
 
+/* قواعد تایپوگرافی و دکمه‌های اصلی صفحات پنل مدیریت */
+@layer components {
+  .admin-page-title {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .admin-header-meta {
+    font-size: 10px;
+    line-height: 1.5;
+  }
+
+  .admin-page-action {
+    height: 36px !important;
+  }
+
+  @media (min-width: 64rem) {
+    .admin-page-title {
+      font-size: 20px;
+    }
+
+    .admin-page-action {
+      height: 52px !important;
+    }
+  }
+}
+
 @keyframes skeleton-shimmer {
   100% {
     transform: translateX(100%);

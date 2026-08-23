@@ -1,5 +1,6 @@
+import Image from "next/image";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ChevronDown, Eye, Pencil, Trash2 } from "lucide-react";
+import { ChevronDown, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { DataTableColumnMeta } from "@/components/data-table";
 import type { CategoryNode } from "./categories-data";
@@ -81,7 +82,7 @@ export function createCategoryColumns(
             type="button"
             variant="ghost"
           >
-            <Trash2 size={21} strokeWidth={1.6} />
+            <Image alt="" aria-hidden="true" height={32} src="/icon/adminDashboard/deleteBtn.svg" width={32} />
           </Button>
           <Button
             aria-label={`ویرایش ${row.original.name}`}
@@ -91,7 +92,7 @@ export function createCategoryColumns(
             type="button"
             variant="ghost"
           >
-            <Pencil size={20} strokeWidth={1.6} />
+            <Image alt="" aria-hidden="true" height={32} src="/icon/adminDashboard/editBtn.svg" width={32} />
           </Button>
           <Button
             aria-label={`مشاهده ${row.original.name}`}

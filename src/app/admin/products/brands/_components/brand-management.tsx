@@ -101,7 +101,7 @@ export function BrandManagement() {
             value={query}
           />
         </label>
-        <Button className="h-[52px] gap-3 px-6 sm:w-36" onClick={openCreateDrawer} type="button">
+        <Button className="admin-page-action gap-3 px-6 sm:w-36" onClick={openCreateDrawer} type="button">
           <Plus size={21} />
           افزودن برند
         </Button>

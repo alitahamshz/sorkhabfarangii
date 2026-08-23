@@ -1,13 +1,14 @@
 "use client";
 
-import { ArrowRight, Bell, Menu, Moon } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, Menu } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 export function AdminHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
   const pathname = usePathname();
   const isProductsPage = pathname.startsWith("/admin/products");
-  const isCategoriesPage = pathname === "/admin/products/categories";
+  const isCategoriesPage = pathname.startsWith("/admin/products/categories");
   const isBrandsPage = pathname === "/admin/products/brands";
   const title = isBrandsPage
     ? "برندها"
@@ -48,8 +49,8 @@ export function AdminHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
           </Button>
 
           <div>
-            <h1 className="text-base font-medium text-zinc-900 lg:text-xl">{title}</h1>
-            <div className="mt-1 flex items-center gap-1.5 text-[9px] lg:mt-1.5 lg:text-[10px]">
+            <h1 className="admin-page-title font-medium text-zinc-900">{title}</h1>
+            <div className="admin-header-meta mt-1 flex items-center gap-1.5 lg:mt-1.5">
               <span className="text-zinc-400">داشبورد</span>
               <span className="text-zinc-400">&gt;</span>
               {isProductsPage ? (
@@ -63,18 +64,18 @@ export function AdminHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
           </div>
         </div>
 
-        <div className="flex items-center gap-7 text-zinc-700" dir="ltr">
-          <Button aria-label="حالت شب" className="cursor-pointer transition-colors hover:text-primary-500" size="icon" type="button" variant="ghost">
-            <Moon size={20} strokeWidth={1.5} />
+        <div className="flex items-center gap-2" dir="ltr">
+          <Button aria-label="حالت شب" className="cursor-pointer" size="icon" type="button" variant="ghost">
+            <Image alt="" aria-hidden="true" className="size-5 lg:size-6" height={24} src="/icon/header/moon.svg" width={24} />
           </Button>
           <Button
             aria-label="اعلان‌ها"
-            className="relative cursor-pointer transition-colors hover:text-primary-500"
+            className="relative cursor-pointer"
             size="icon"
             type="button"
             variant="ghost"
           >
-            <Bell size={19} strokeWidth={1.4} />
+            <Image alt="" aria-hidden="true" className="size-5 lg:size-6" height={24} src="/icon/header/bell.svg" width={24} />
             <span className="absolute -right-0.5 top-0 size-1.5 rounded-full bg-red-500 ring-1 ring-white" />
           </Button>
         </div>

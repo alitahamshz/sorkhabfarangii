@@ -126,7 +126,7 @@ export function ProductList() {
             {Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
           </select>
         </label>
-        <Button className="h-12 px-5" onClick={() => setMessage("فرم افزودن محصول در مرحله بعد به این دکمه متصل می‌شود.")} type="button">
+        <Button className="admin-page-action px-5" onClick={() => setMessage("فرم افزودن محصول در مرحله بعد به این دکمه متصل می‌شود.")} type="button">
           <Plus />
           افزودن محصول
         </Button>

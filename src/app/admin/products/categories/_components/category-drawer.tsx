@@ -11,6 +11,7 @@ import type { Category } from "./categories-data";
 type CategoryDrawerProps = {
   categories: Category[];
   category: Category | null;
+  defaultParentId?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (values: Omit<Category, "id" | "icon" | "productCount">) => void;
@@ -34,12 +35,12 @@ function getUnavailableParentIds(categories: Category[], editingId?: string) {
   return unavailable;
 }
 
-export function CategoryDrawer({ categories, category, open, onOpenChange, onSave }: CategoryDrawerProps) {
+export function CategoryDrawer({ categories, category, defaultParentId = "", open, onOpenChange, onSave }: CategoryDrawerProps) {
   const inputId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState(category?.name ?? "");
   const [description, setDescription] = useState(category?.description ?? "");
-  const [parentId, setParentId] = useState(category?.parentId ?? "");
+  const [parentId, setParentId] = useState(category?.parentId ?? defaultParentId);
   const [imageUrl, setImageUrl] = useState(category?.imageUrl ?? "");
   const [isDragging, setIsDragging] = useState(false);
   const [fileError, setFileError] = useState("");
@@ -49,11 +50,11 @@ export function CategoryDrawer({ categories, category, open, onOpenChange, onSav
     if (!open) return;
     setName(category?.name ?? "");
     setDescription(category?.description ?? "");
-    setParentId(category?.parentId ?? "");
+    setParentId(category?.parentId ?? defaultParentId);
     setImageUrl(category?.imageUrl ?? "");
     setIsDragging(false);
     setFileError("");
-  }, [category, open]);
+  }, [category, defaultParentId, open]);
 
   function loadImage(file?: File) {
     if (!file) return;
