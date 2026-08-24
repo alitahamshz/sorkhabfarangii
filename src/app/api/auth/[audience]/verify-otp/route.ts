@@ -32,12 +32,42 @@ export async function POST(
     return NextResponse.json({ success: false, message: "INVALID_OTP_INPUT", data: null }, { status: 400 });
   }
 
+  let payload: VerifyOtpResponse;
   try {
-    const payload = await serverApi.post<VerifyOtpResponse, VerifyOtpInput>(
+    payload = await serverApi.post<VerifyOtpResponse, VerifyOtpInput>(
       `/${serviceByAudience[audience]}/sign/code/valid`, input, { cache: "no-store" },
     );
-    const response = NextResponse.json(payload);
-    if (payload.success && payload.data?.token && payload.data.user) {
+    console.info("[verify-otp] raw backend response:", payload);
+  } catch (error) {
+    console.error("[verify-otp] backend request error:", error);
+    if (isApiError(error)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: error.message,
+          data: error.data ?? null,
+          debug: {
+            code: error.code ?? null,
+            status: error.status,
+          },
+        },
+        { status: error.status || 502 },
+      );
+    }
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: error instanceof Error ? error.message : String(error),
+        data: null,
+      },
+      { status: 500 },
+    );
+  }
+
+  const response = NextResponse.json(payload);
+  if (payload.success && payload.data?.token && payload.data.user) {
+    try {
       const { user } = payload.data;
       const session = await createServerSession({
         audience,
@@ -54,12 +84,10 @@ export async function POST(
         name: user.first_name ?? "",
       }, payload.data.token);
       await setAuthCookies(response, session);
+    } catch (error) {
+      console.error("[verify-otp] session/cookie error:", error);
     }
-    return response;
-  } catch (error) {
-    if (isApiError(error) && error.data && typeof error.data === "object") {
-      return NextResponse.json(error.data, { status: error.status || 502 });
-    }
-    return NextResponse.json({ success: false, message: "OTP_VERIFY_UPSTREAM_UNREACHABLE", data: null }, { status: 502 });
   }
+
+  return response;
 }

@@ -6,6 +6,8 @@ import { ArrowRight, ChevronDown, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import type { Category } from "./categories-data";
 
 type CategoryDrawerProps = {
@@ -39,9 +41,13 @@ export function CategoryDrawer({ categories, category, defaultParentId = "", ope
   const inputId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState(category?.name ?? "");
-  const [description, setDescription] = useState(category?.description ?? "");
+  const [latinName, setLatinName] = useState(category?.latinName ?? "");
   const [parentId, setParentId] = useState(category?.parentId ?? defaultParentId);
   const [imageUrl, setImageUrl] = useState(category?.imageUrl ?? "");
+  const [isActive, setIsActive] = useState(category?.isActive ?? true);
+  const [seoTitle, setSeoTitle] = useState(category?.seoTitle ?? "");
+  const [seoDescription, setSeoDescription] = useState(category?.seoDescription ?? "");
+  const [displayPriority, setDisplayPriority] = useState(category?.displayPriority ?? 1);
   const [isDragging, setIsDragging] = useState(false);
   const [fileError, setFileError] = useState("");
   const unavailableParentIds = getUnavailableParentIds(categories, category?.id);
@@ -49,9 +55,13 @@ export function CategoryDrawer({ categories, category, defaultParentId = "", ope
   useEffect(() => {
     if (!open) return;
     setName(category?.name ?? "");
-    setDescription(category?.description ?? "");
+    setLatinName(category?.latinName ?? "");
     setParentId(category?.parentId ?? defaultParentId);
     setImageUrl(category?.imageUrl ?? "");
+    setIsActive(category?.isActive ?? true);
+    setSeoTitle(category?.seoTitle ?? "");
+    setSeoDescription(category?.seoDescription ?? "");
+    setDisplayPriority(category?.displayPriority ?? 1);
     setIsDragging(false);
     setFileError("");
   }, [category, defaultParentId, open]);
@@ -88,9 +98,14 @@ export function CategoryDrawer({ categories, category, defaultParentId = "", ope
     if (!name.trim()) return;
     onSave({
       name: name.trim(),
-      description: description.trim(),
+      latinName: latinName.trim() || undefined,
+      description: category?.description ?? "",
       imageUrl: imageUrl || undefined,
       parentId: parentId || null,
+      isActive,
+      seoTitle: seoTitle.trim() || undefined,
+      seoDescription: seoDescription.trim() || undefined,
+      displayPriority,
     });
     onOpenChange(false);
   }
@@ -132,14 +147,14 @@ export function CategoryDrawer({ categories, category, defaultParentId = "", ope
             />
           </label>
 
-          <label className="block" htmlFor={`${inputId}-description`}>
-            <span className="mb-2 block text-sm text-zinc-500">توضیح مختصر</span>
+          <label className="block" htmlFor={`${inputId}-latin-name`}>
+            <span className="mb-2 block text-sm text-zinc-500">نام لاتین دسته‌بندی</span>
             <Input
-              className="h-12 border-zinc-200 px-3 text-right shadow-sm"
-              id={`${inputId}-description`}
-              onChange={(event) => setDescription(event.target.value)}
-              placeholder="توضیح کوتاه دسته‌بندی"
-              value={description}
+              className="h-12 border-zinc-200 px-3 text-left shadow-sm"
+              dir="ltr"
+              id={`${inputId}-latin-name`}
+              onChange={(event) => setLatinName(event.target.value)}
+              value={latinName}
             />
           </label>
 
@@ -187,7 +202,7 @@ export function CategoryDrawer({ categories, category, defaultParentId = "", ope
           </div>
 
           <label className="block" htmlFor={`${inputId}-parent`}>
-            <span className="mb-2 block text-sm text-zinc-500">دسته‌بندی والد (اختیاری)</span>
+            <span className="mb-2 block text-sm text-zinc-500">دسته‌بندی والد</span>
             <span className="relative block">
               <select
                 className="h-12 w-full appearance-none rounded-lg border border-zinc-200 bg-white px-3 pl-10 text-sm text-zinc-600 outline-none focus:border-primary-500 focus:ring-3 focus:ring-primary-500/15"
@@ -195,10 +210,57 @@ export function CategoryDrawer({ categories, category, defaultParentId = "", ope
                 onChange={(event) => setParentId(event.target.value)}
                 value={parentId}
               >
-                <option value="">بدون والد (دسته‌بندی اصلی)</option>
+                <option value="">بدون والد</option>
                 {categories
                   .filter((item) => !unavailableParentIds.has(item.id))
                   .map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+              </select>
+              <ChevronDown className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={19} />
+            </span>
+          </label>
+
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-zinc-500">وضعیت انتشار:</span>
+            <span className="text-sm text-zinc-500">{isActive ? "فعال" : "غیرفعال"}</span>
+            <Switch
+              aria-label="وضعیت انتشار دسته‌بندی"
+              checked={isActive}
+              onCheckedChange={setIsActive}
+            />
+          </div>
+
+          <label className="block" htmlFor={`${inputId}-seo-title`}>
+            <span className="mb-2 block text-sm text-zinc-500">عنوان متا SEO</span>
+            <Input
+              className="h-12 border-zinc-200 px-3 text-right shadow-sm"
+              id={`${inputId}-seo-title`}
+              onChange={(event) => setSeoTitle(event.target.value)}
+              value={seoTitle}
+            />
+          </label>
+
+          <label className="block" htmlFor={`${inputId}-seo-description`}>
+            <span className="mb-2 block text-sm text-zinc-500">توضیحات متا SEO</span>
+            <Textarea
+              className="min-h-[74px] resize-none border-zinc-200 px-3 text-right shadow-sm"
+              id={`${inputId}-seo-description`}
+              onChange={(event) => setSeoDescription(event.target.value)}
+              value={seoDescription}
+            />
+          </label>
+
+          <label className="block" htmlFor={`${inputId}-priority`}>
+            <span className="mb-2 block text-sm text-zinc-500">اولویت نمایش</span>
+            <span className="relative block">
+              <select
+                className="h-12 w-full appearance-none rounded-lg border border-zinc-200 bg-white px-3 pl-10 text-sm text-zinc-600 outline-none focus:border-primary-500 focus:ring-3 focus:ring-primary-500/15"
+                id={`${inputId}-priority`}
+                onChange={(event) => setDisplayPriority(Number(event.target.value))}
+                value={displayPriority}
+              >
+                {Array.from({ length: 10 }, (_, index) => index + 1).map((priority) => (
+                  <option key={priority} value={priority}>{priority.toLocaleString("fa-IR")}</option>
+                ))}
               </select>
               <ChevronDown className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={19} />
             </span>

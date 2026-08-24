@@ -1,10 +1,15 @@
 export type Category = {
   id: string;
   name: string;
+  latinName?: string;
   description: string;
   icon: string;
   imageUrl?: string;
   parentId: string | null;
+  isActive?: boolean;
+  seoTitle?: string;
+  seoDescription?: string;
+  displayPriority?: number;
   productCount: number;
 };
 
