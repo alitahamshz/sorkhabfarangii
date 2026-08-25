@@ -36,9 +36,8 @@ export function createCategoryColumns(
         return (
           <Button
             aria-expanded={row.getIsExpanded()}
-            className={`h-7 gap-1.5 rounded-md px-2.5 text-[11px] ${
-              count ? "bg-primary-50 text-primary-600 hover:bg-primary-100" : "text-zinc-400"
-            }`}
+            className={`h-7 gap-1.5 rounded-md px-2.5 text-[11px] ${count ? "bg-primary-50 text-primary-600 hover:bg-primary-100" : "text-zinc-400"
+              }`}
             disabled={!row.getCanExpand()}
             onClick={row.getToggleExpandedHandler()}
             type="button"
@@ -73,7 +72,7 @@ export function createCategoryColumns(
       header: "عملیات",
       enableHiding: false,
       cell: ({ row }) => (
-        <div className="flex items-center gap-2" dir="ltr">
+        <div className="flex items-center gap-2 px-5" dir="ltr">
           <Button
             aria-label={`حذف ${row.original.name}`}
             className="text-red-500 hover:bg-red-50 hover:text-red-600"
@@ -82,7 +81,7 @@ export function createCategoryColumns(
             type="button"
             variant="ghost"
           >
-            <Image alt="" aria-hidden="true" height={32} src="/icon/adminDashboard/deleteBtn.svg" width={32} />
+            <Image alt="حذف" aria-hidden="true" height={32} src="/icon/adminDashboard/deleteBtn.svg" width={32} />
           </Button>
           <Button
             aria-label={`ویرایش ${row.original.name}`}
@@ -92,7 +91,7 @@ export function createCategoryColumns(
             type="button"
             variant="ghost"
           >
-            <Image alt="" aria-hidden="true" height={32} src="/icon/adminDashboard/editBtn.svg" width={32} />
+            <Image src={'/icon/adminDashboard/editBtn.svg'} alt="ویرایش" aria-hidden="true" height={32} width={32} />
           </Button>
           <Button
             aria-label={`مشاهده ${row.original.name}`}
@@ -102,7 +101,7 @@ export function createCategoryColumns(
             type="button"
             variant="ghost"
           >
-            <Eye size={22} strokeWidth={1.6} />
+            <Image alt="مشاهده" src={'/icon/adminDashboard/eyeIcon.svg'} width={32} height={32} />
           </Button>
         </div>
       ),

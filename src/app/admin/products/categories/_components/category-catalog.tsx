@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CategoryDeleteDialog } from "./category-delete-dialog";
 import { CategoryDrawer } from "./category-drawer";
 import { initialCategories, type Category } from "./categories-data";
 
@@ -27,6 +28,7 @@ export function CategoryCatalog() {
   const [categories, setCategories] = useState(initialCategories);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const rootCategories = useMemo(
     () => categories.filter((category) => category.parentId === null),
@@ -45,12 +47,12 @@ export function CategoryCatalog() {
   }
 
   function removeCategory(category: Category) {
-    if (!window.confirm(`دسته‌بندی «${category.name}» و همه زیر‌دسته‌های آن حذف شود؟`)) return;
     setCategories((current) => {
       const ids = collectDescendantIds(current, category.id);
       return current.filter((item) => !ids.has(item.id));
     });
     setMessage(`دسته‌بندی «${category.name}» حذف شد.`);
+    setCategoryToDelete(null);
   }
 
   function saveCategory(values: Omit<Category, "id" | "icon" | "productCount">) {
@@ -119,7 +121,7 @@ export function CategoryCatalog() {
                 <Button aria-label={`ویرایش ${category.name}`} className="text-zinc-600 hover:text-primary-500" onClick={() => openEditDrawer(category)} size="icon" type="button" variant="ghost">
                   <Image alt="" aria-hidden="true" height={32} src="/icon/adminDashboard/editBtn.svg" width={32} />
                 </Button>
-                <Button aria-label={`حذف ${category.name}`} className="text-red-500 hover:bg-red-50 hover:text-red-600" onClick={() => removeCategory(category)} size="icon" type="button" variant="ghost">
+                <Button aria-label={`حذف ${category.name}`} className="text-red-500 hover:bg-red-50 hover:text-red-600" onClick={() => setCategoryToDelete(category)} size="icon" type="button" variant="ghost">
                   <Image alt="" aria-hidden="true" height={32} src="/icon/adminDashboard/deleteBtn.svg" width={32} />
                 </Button>
               </div>
@@ -134,6 +136,7 @@ export function CategoryCatalog() {
       </section>
 
       <CategoryDrawer categories={categories} category={editingCategory} onOpenChange={setDrawerOpen} onSave={saveCategory} open={drawerOpen} />
+      <CategoryDeleteDialog category={categoryToDelete} onCancel={() => setCategoryToDelete(null)} onConfirm={removeCategory} />
     </div>
   );
 }
