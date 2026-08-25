@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import { Fragment, useMemo, useState } from "react";
-import { ChevronDown, Eye, Filter, MoreHorizontal, Pencil, Plus, Search, Trash2, X } from "lucide-react";
+import { ChevronDown, Eye, Filter, MoreHorizontal, Plus, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CategoryDeleteDialog } from "./category-delete-dialog";
 import { CategoryDrawer } from "./category-drawer";
+import { CategoryViewSheet } from "./category-view-sheet";
 import { buildCategoryTree, initialCategories, type Category, type CategoryNode } from "./categories-data";
 
 type CategoryFilter = "all" | "with-children" | "without-children";
@@ -60,10 +62,10 @@ function CategoryRow({ category, depth, expandedIds, onDelete, onEdit, onToggle,
   return (
     <Fragment>
       <TableRow className={depth > 0 ? "bg-secondary-50/50 hover:bg-secondary-50/70" : "bg-white hover:bg-zinc-50/70"}>
-        <TableCell className="h-[70px] w-[56%] px-4 text-sm font-medium text-zinc-800 md:w-[42%] md:px-6">
-          <span className="block" style={{ paddingRight: `${depth * 22}px` }}>{category.name}</span>
+        <TableCell className="h-[70px] w-[42%] px-3 text-sm font-medium text-zinc-800 md:w-[35%] md:px-6">
+          <span className="block truncate" style={{ paddingRight: `${depth * 22}px` }}>{category.name}</span>
         </TableCell>
-        <TableCell className="h-[70px] w-[24%] px-2 md:w-[20%] md:px-3">
+        <TableCell className="h-[70px] w-[20%] px-1 md:w-[15%] md:px-3">
           {childCount ? (
             <Button
               aria-expanded={isExpanded}
@@ -78,10 +80,21 @@ function CategoryRow({ category, depth, expandedIds, onDelete, onEdit, onToggle,
             </Button>
           ) : null}
         </TableCell>
-        <TableCell className="hidden h-[70px] w-[20%] px-3 text-xs text-zinc-500 md:table-cell">
+        <TableCell className="h-[70px] w-[23%] px-1 text-center md:w-[15%] md:px-3">
+          <span
+            className={`inline-flex min-w-12 justify-center rounded-md px-2 py-1 text-[11px] font-medium ${
+              category.isActive === false
+                ? "bg-[#F1E6E9] text-primary-500"
+                : "bg-[#F3FAF7] text-green-600"
+            }`}
+          >
+            {category.isActive === false ? "غیرفعال" : "فعال"}
+          </span>
+        </TableCell>
+        <TableCell className="hidden h-[70px] w-[17%] px-3 text-xs text-zinc-500 md:table-cell">
           {category.productCount.toLocaleString("fa-IR")} محصول
         </TableCell>
-        <TableCell className="h-[70px] w-[20%] px-2 md:w-[18%] md:px-5">
+        <TableCell className="h-[70px] w-[15%] px-1 md:w-[18%] md:px-5">
           <div className="hidden items-center gap-1 md:flex" dir="ltr">
             <Button aria-label={`حذف ${category.name}`} className="hover:bg-red-50" onClick={() => onDelete(category)} size="icon" type="button" variant="ghost"><Image alt="" aria-hidden="true" height={32} src="/icon/adminDashboard/deleteBtn.svg" width={32} /></Button>
             <Button aria-label={`ویرایش ${category.name}`} onClick={() => onEdit(category)} size="icon" type="button" variant="ghost"><Image alt="" aria-hidden="true" height={32} src="/icon/adminDashboard/editBtn.svg" width={32} /></Button>
@@ -101,15 +114,15 @@ function CategoryRow({ category, depth, expandedIds, onDelete, onEdit, onToggle,
               sideOffset={4}
             >
               <DropdownMenuItem className="h-9 justify-between rounded-none border-b border-zinc-100 px-3 text-xs text-zinc-500" onClick={() => onView(category)}>
-                <Eye size={17} strokeWidth={1.5} />
+                <Image alt="" aria-hidden="true" height={18} src="/icon/adminDashboard/eyeIcon.png" width={18} />
                 <span>مشاهده</span>
               </DropdownMenuItem>
               <DropdownMenuItem className="h-9 justify-between rounded-none border-b border-zinc-100 px-3 text-xs text-zinc-500" onClick={() => onEdit(category)}>
-                <Pencil size={17} strokeWidth={1.5} />
+                <Image alt="" aria-hidden="true" height={24} src="/icon/adminDashboard/editBtn.svg" width={24} />
                 <span>ویرایش</span>
               </DropdownMenuItem>
               <DropdownMenuItem className="h-9 justify-between rounded-none px-3 text-xs" onClick={() => onDelete(category)} variant="destructive">
-                <Trash2 size={17} strokeWidth={1.5} />
+                <Image alt="" aria-hidden="true" height={24} src="/icon/adminDashboard/deleteBtn.svg" width={24} />
                 <span>حذف</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -135,6 +148,7 @@ function CategoryRow({ category, depth, expandedIds, onDelete, onEdit, onToggle,
 }
 
 export function CategoryDetails({ categoryId }: { categoryId: string }) {
+  const isMobile = useIsMobile();
   const [categories, setCategories] = useState(initialCategories);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<CategoryFilter>("all");
@@ -142,6 +156,7 @@ export function CategoryDetails({ categoryId }: { categoryId: string }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+  const [categoryToView, setCategoryToView] = useState<CategoryNode | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
   const tree = useMemo(() => buildCategoryTree(categories), [categories]);
@@ -163,6 +178,14 @@ export function CategoryDetails({ categoryId }: { categoryId: string }) {
   function openEditDrawer(category: CategoryNode) {
     setEditingCategory(category);
     setDrawerOpen(true);
+  }
+
+  function viewCategory(category: CategoryNode) {
+    if (isMobile) {
+      setCategoryToView(category);
+      return;
+    }
+    setMessage(`دسته‌بندی «${category.name}» انتخاب شد.`);
   }
 
   function removeCategory(category: Category) {
@@ -233,17 +256,18 @@ export function CategoryDetails({ categoryId }: { categoryId: string }) {
         <Table className="table-fixed md:min-w-[760px] md:table-auto">
           <TableHeader className="bg-zinc-50">
             <TableRow className="hover:bg-zinc-50">
-              <TableHead className="h-[52px] w-[56%] px-4 text-xs text-zinc-500 md:w-[42%] md:px-6">دسته بندی {selectedCategory.name}</TableHead>
-              <TableHead className="h-[52px] w-[24%] px-2 text-xs text-zinc-500 md:w-[20%] md:px-3">زیر دسته</TableHead>
-              <TableHead className="hidden h-[52px] w-[20%] px-3 text-xs text-zinc-500 md:table-cell">تعداد</TableHead>
-              <TableHead className="h-[52px] w-[20%] px-2 text-xs text-zinc-500 md:w-[18%] md:px-5">عملیات</TableHead>
+              <TableHead className="h-[52px] w-[42%] px-3 text-xs text-zinc-500 md:w-[35%] md:px-6">دسته بندی {selectedCategory.name}</TableHead>
+              <TableHead className="h-[52px] w-[20%] px-1 text-xs text-zinc-500 md:w-[15%] md:px-3">زیر دسته</TableHead>
+              <TableHead className="h-[52px] w-[23%] px-1 text-center text-xs text-zinc-500 md:w-[15%] md:px-3">وضعیت</TableHead>
+              <TableHead className="hidden h-[52px] w-[17%] px-3 text-xs text-zinc-500 md:table-cell">تعداد</TableHead>
+              <TableHead className="h-[52px] w-[15%] px-1 text-center text-xs text-zinc-500 md:w-[18%] md:px-5 md:text-start">عملیات</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {visibleCategories.length ? visibleCategories.map((category) => (
-              <CategoryRow category={category} depth={0} expandedIds={expandedIds} key={category.id} onDelete={setCategoryToDelete} onEdit={openEditDrawer} onToggle={toggleCategory} onView={(item) => setMessage(`دسته‌بندی «${item.name}» انتخاب شد.`)} />
+              <CategoryRow category={category} depth={0} expandedIds={expandedIds} key={category.id} onDelete={setCategoryToDelete} onEdit={openEditDrawer} onToggle={toggleCategory} onView={viewCategory} />
             )) : (
-              <TableRow className="hover:bg-white"><TableCell className="h-40 text-center text-sm text-zinc-500" colSpan={4}>دسته‌بندی‌ای برای نمایش وجود ندارد.</TableCell></TableRow>
+              <TableRow className="hover:bg-white"><TableCell className="h-40 text-center text-sm text-zinc-500" colSpan={5}>دسته‌بندی‌ای برای نمایش وجود ندارد.</TableCell></TableRow>
             )}
           </TableBody>
         </Table>
@@ -251,6 +275,14 @@ export function CategoryDetails({ categoryId }: { categoryId: string }) {
 
       <CategoryDrawer categories={categories} category={editingCategory} defaultParentId={categoryId} onOpenChange={setDrawerOpen} onSave={saveCategory} open={drawerOpen} />
       <CategoryDeleteDialog category={categoryToDelete} onCancel={() => setCategoryToDelete(null)} onConfirm={removeCategory} />
+      <CategoryViewSheet
+        category={categoryToView}
+        isMobile={isMobile}
+        onClose={() => setCategoryToView(null)}
+        parentName={categoryToView?.parentId
+          ? categories.find((category) => category.id === categoryToView.parentId)?.name ?? selectedCategory.name
+          : selectedCategory.name}
+      />
     </div>
   );
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -8,6 +7,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Sheet,
   SheetClose,
@@ -15,22 +15,6 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import type { Category } from "./categories-data";
-
-const mobileMediaQuery = "(max-width: 639px)";
-
-function subscribeToMobileView(callback: () => void) {
-  const mediaQuery = window.matchMedia(mobileMediaQuery);
-  mediaQuery.addEventListener("change", callback);
-  return () => mediaQuery.removeEventListener("change", callback);
-}
-
-function getMobileSnapshot() {
-  return window.matchMedia(mobileMediaQuery).matches;
-}
-
-function getServerMobileSnapshot() {
-  return false;
-}
 
 type CategoryDeleteDialogProps = {
   category: Category | null;
@@ -43,11 +27,7 @@ export function CategoryDeleteDialog({
   onCancel,
   onConfirm,
 }: CategoryDeleteDialogProps) {
-  const isMobile = useSyncExternalStore(
-    subscribeToMobileView,
-    getMobileSnapshot,
-    getServerMobileSnapshot,
-  );
+  const isMobile = useIsMobile();
 
   if (isMobile) {
     return (
