@@ -205,7 +205,7 @@ export function CategoryDrawer({ categories, category, defaultParentId = "", ope
             <span className="mb-2 block text-sm text-zinc-500">دسته‌بندی والد</span>
             <span className="relative block">
               <select
-                className="h-12 w-full appearance-none rounded-lg border border-zinc-200 bg-white px-3 pl-10 text-sm text-zinc-600 outline-none focus:border-primary-500 focus:ring-3 focus:ring-primary-500/15"
+                className="h-12 w-full appearance-none rounded-lg border border-zinc-200 bg-white px-3 pl-10 text-sm text-zinc-600 outline-none focus:border-zinc-400 focus:ring-3 focus:ring-zinc-200/60"
                 id={`${inputId}-parent`}
                 onChange={(event) => setParentId(event.target.value)}
                 value={parentId}
@@ -253,7 +253,7 @@ export function CategoryDrawer({ categories, category, defaultParentId = "", ope
             <span className="mb-2 block text-sm text-zinc-500">اولویت نمایش</span>
             <span className="relative block">
               <select
-                className="h-12 w-full appearance-none rounded-lg border border-zinc-200 bg-white px-3 pl-10 text-sm text-zinc-600 outline-none focus:border-primary-500 focus:ring-3 focus:ring-primary-500/15"
+                className="h-12 w-full appearance-none rounded-lg border border-zinc-200 bg-white px-3 pl-10 text-sm text-zinc-600 outline-none focus:border-zinc-400 focus:ring-3 focus:ring-zinc-200/60"
                 id={`${inputId}-priority`}
                 onChange={(event) => setDisplayPriority(Number(event.target.value))}
                 value={displayPriority}

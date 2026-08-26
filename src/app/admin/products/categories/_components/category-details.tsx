@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Fragment, useMemo, useState } from "react";
-import { ChevronDown, Eye, Filter, MoreHorizontal, Plus, Search, X } from "lucide-react";
+import { ChevronDown, Eye, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -15,10 +15,13 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CategoryDeleteDialog } from "./category-delete-dialog";
 import { CategoryDrawer } from "./category-drawer";
+import {
+  CategoryFilterSheet,
+  type CategoryChildrenFilter,
+  type CategoryStatusFilter,
+} from "./category-filter-sheet";
 import { CategoryViewSheet } from "./category-view-sheet";
 import { buildCategoryTree, initialCategories, type Category, type CategoryNode } from "./categories-data";
-
-type CategoryFilter = "all" | "with-children" | "without-children";
 
 function filterNodes(nodes: CategoryNode[], query: string): CategoryNode[] {
   const normalizedQuery = query.trim().toLocaleLowerCase("fa-IR");
@@ -105,7 +108,7 @@ function CategoryRow({ category, depth, expandedIds, onDelete, onEdit, onToggle,
               aria-label={`عملیات ${category.name}`}
               className="mx-auto grid size-8 place-items-center rounded-md text-zinc-500 outline-none hover:bg-zinc-100 data-popup-open:bg-zinc-100 md:hidden"
             >
-              <MoreHorizontal size={20} />
+              <Image alt="" aria-hidden="true" height={24} src="/icon/adminDashboard/more.svg" width={24} />
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
@@ -151,7 +154,10 @@ export function CategoryDetails({ categoryId }: { categoryId: string }) {
   const isMobile = useIsMobile();
   const [categories, setCategories] = useState(initialCategories);
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<CategoryFilter>("all");
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [childrenFilter, setChildrenFilter] = useState<CategoryChildrenFilter>("all");
+  const [statusFilter, setStatusFilter] = useState<CategoryStatusFilter>("all");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set(categoryId === "beauty" ? ["lip-makeup"] : []));
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -163,10 +169,17 @@ export function CategoryDetails({ categoryId }: { categoryId: string }) {
   const selectedCategory = tree.find((category) => category.id === categoryId);
   const visibleCategories = useMemo(() => {
     const searched = filterNodes(selectedCategory?.children ?? [], query);
-    if (filter === "with-children") return searched.filter((category) => category.children.length > 0);
-    if (filter === "without-children") return searched.filter((category) => category.children.length === 0);
-    return searched;
-  }, [filter, query, selectedCategory]);
+    return searched.filter((category) => {
+      const matchesChildren = childrenFilter === "all" ||
+        (childrenFilter === "with-children" ? category.children.length > 0 : category.children.length === 0);
+      const isActive = category.isActive !== false;
+      const matchesStatus = statusFilter === "all" ||
+        (statusFilter === "active" ? isActive : !isActive);
+
+      return matchesChildren && matchesStatus;
+    });
+  }, [childrenFilter, query, selectedCategory, statusFilter]);
+  const hasActiveFilters = childrenFilter !== "all" || statusFilter !== "all";
   const rootCategories = categories.filter((category) => category.parentId === null);
   const productCount = rootCategories.reduce((sum, category) => sum + category.productCount, 0);
 
@@ -233,24 +246,59 @@ export function CategoryDetails({ categoryId }: { categoryId: string }) {
         </div>
       ) : null}
 
-      <div className="flex flex-col gap-4 md:flex-row">
-        <label className="relative min-w-0 flex-1">
+      <div className="flex items-center justify-between gap-3 border-b border-zinc-200 pb-3 md:border-0 md:pb-0">
+        <label className="relative hidden min-w-0 flex-1 md:block">
           <span className="sr-only">جستجوی دسته‌بندی</span>
-          <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500" size={22} strokeWidth={1.5} />
-          <Input className="h-[52px] rounded-lg border-zinc-200 bg-white pr-12 shadow-sm" onChange={(event) => setQuery(event.target.value)} placeholder="جستجوی محصول..." type="search" value={query} />
+          <Image alt="" aria-hidden="true" className="absolute right-4 top-1/2 -translate-y-1/2" height={24} src="/icon/adminDashboard/search.svg" width={24} />
+          <Input className="h-[52px] rounded-lg border-zinc-200 bg-white pr-12 shadow-none" onChange={(event) => setQuery(event.target.value)} placeholder="جستجوی محصول..." type="search" value={query} />
         </label>
-        <label className="relative md:w-32">
-          <span className="sr-only">فیلتر دسته‌بندی</span>
-          <Filter className="pointer-events-none absolute right-3 top-1/2 z-10 -translate-y-1/2 text-zinc-500" size={20} strokeWidth={1.5} />
-          <select className="h-[52px] w-full appearance-none rounded-lg border border-zinc-200 bg-white pr-10 pl-8 text-sm text-zinc-700 outline-none shadow-sm focus:border-primary-500" onChange={(event) => setFilter(event.target.value as CategoryFilter)} value={filter}>
-            <option value="all">فیلتر</option>
-            <option value="with-children">دارای زیر دسته</option>
-            <option value="without-children">بدون زیر دسته</option>
-          </select>
-          <ChevronDown className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
-        </label>
-        <Button className="admin-page-action gap-2 px-4 md:w-44" onClick={openCreateDrawer} type="button"><Plus size={21} />افزودن دسته بندی جدید</Button>
+
+        <div className="flex items-center gap-2 md:contents">
+          <Button
+            aria-expanded={mobileSearchOpen}
+            aria-label="جستجوی دسته‌بندی"
+            className="size-[52px] rounded-lg border-zinc-200 bg-white text-zinc-500 shadow-none hover:bg-zinc-50 md:hidden"
+            onClick={() => setMobileSearchOpen((current) => !current)}
+            size="icon"
+            type="button"
+            variant="outline"
+          >
+            <Image alt="" aria-hidden="true" height={24} src="/icon/adminDashboard/search.svg" width={24} />
+          </Button>
+          <Button
+            aria-label="فیلتر دسته‌بندی‌ها"
+            className={`h-[52px] w-[52px] rounded-lg border-zinc-200 bg-white shadow-none hover:bg-zinc-50 md:w-32 ${
+              hasActiveFilters ? "border-primary-200 text-primary-500" : "text-zinc-500"
+            }`}
+            onClick={() => setFilterOpen(true)}
+            type="button"
+            variant="outline"
+          >
+            <Image alt="" aria-hidden="true" height={24} src="/icon/adminDashboard/filter.svg" width={24} />
+            <span className="hidden md:inline">فیلتر</span>
+          </Button>
+        </div>
+
+        <Button className="admin-page-action h-[52px]! gap-2 px-4 md:w-48" onClick={openCreateDrawer} type="button">
+          <Plus size={21} />
+          <span className="hidden md:inline">افزودن </span>دسته بندی جدید
+        </Button>
       </div>
+
+      {mobileSearchOpen ? (
+        <label className="relative block md:hidden">
+          <span className="sr-only">جستجوی دسته‌بندی</span>
+          <Image alt="" aria-hidden="true" className="absolute right-4 top-1/2 -translate-y-1/2" height={24} src="/icon/adminDashboard/search.svg" width={24} />
+          <Input
+            autoFocus
+            className="h-[52px] rounded-lg border-zinc-200 bg-white pr-12 shadow-none"
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="جستجوی دسته‌بندی..."
+            type="search"
+            value={query}
+          />
+        </label>
+      ) : null}
 
       <section aria-label={`زیر دسته‌های ${selectedCategory.name}`} className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
         <Table className="table-fixed md:min-w-[760px] md:table-auto">
@@ -282,6 +330,14 @@ export function CategoryDetails({ categoryId }: { categoryId: string }) {
         parentName={categoryToView?.parentId
           ? categories.find((category) => category.id === categoryToView.parentId)?.name ?? selectedCategory.name
           : selectedCategory.name}
+      />
+      <CategoryFilterSheet
+        childrenFilter={childrenFilter}
+        onChildrenFilterChange={setChildrenFilter}
+        onOpenChange={setFilterOpen}
+        onStatusFilterChange={setStatusFilter}
+        open={filterOpen}
+        statusFilter={statusFilter}
       />
     </div>
   );

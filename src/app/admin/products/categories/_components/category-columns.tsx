@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ChevronDown, Eye } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { DataTableColumnMeta } from "@/components/data-table";
 import type { CategoryNode } from "./categories-data";
@@ -101,7 +101,7 @@ export function createCategoryColumns(
             type="button"
             variant="ghost"
           >
-            <Image alt="مشاهده" src={'/icon/adminDashboard/eyeIcon.svg'} width={32} height={32} />
+            <Image alt="مشاهده" src="/icon/adminDashboard/eyeIcon.png" width={32} height={32} />
           </Button>
         </div>
       ),

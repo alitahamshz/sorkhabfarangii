@@ -1,28 +1,53 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
-import { Plus, Search, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { DataTable } from "@/components/data-table";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Input } from "@/components/ui/input";
 import { createBrandColumns } from "./brand-columns";
+import { BrandDeleteDialog } from "./brand-delete-dialog";
 import { BrandDrawer } from "./brand-drawer";
+import {
+  BrandFilterSheet,
+  type BrandAvailabilityFilter,
+  type BrandStatusFilter,
+} from "./brand-filter-sheet";
+import { BrandViewSheet } from "./brand-view-sheet";
 import { initialBrands, type Brand } from "./brands-data";
 
 export function BrandManagement() {
+  const isMobile = useIsMobile();
   const [brands, setBrands] = useState(initialBrands);
   const [query, setQuery] = useState("");
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [availabilityFilter, setAvailabilityFilter] = useState<BrandAvailabilityFilter>("all");
+  const [statusFilter, setStatusFilter] = useState<BrandStatusFilter>("all");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
+  const [brandToDelete, setBrandToDelete] = useState<Brand | null>(null);
+  const [brandToView, setBrandToView] = useState<Brand | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
   const filteredBrands = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase("fa-IR");
-    if (!normalizedQuery) return brands;
-    return brands.filter((brand) =>
-      `${brand.name} ${brand.origin}`.toLocaleLowerCase("fa-IR").includes(normalizedQuery),
-    );
-  }, [brands, query]);
+    return brands.filter((brand) => {
+      const matchesQuery = !normalizedQuery ||
+        `${brand.name} ${brand.latinName ?? ""} ${brand.origin}`
+          .toLocaleLowerCase("fa-IR")
+          .includes(normalizedQuery);
+      const matchesAvailability = availabilityFilter === "all" ||
+        (availabilityFilter === "in-stock" ? brand.productCount > 0 : brand.productCount === 0);
+      const matchesStatus = statusFilter === "all" || brand.status === statusFilter;
+
+      return matchesQuery && matchesAvailability && matchesStatus;
+    });
+  }, [availabilityFilter, brands, query, statusFilter]);
+
+  const hasActiveFilters = availabilityFilter !== "all" || statusFilter !== "all";
 
   function openCreateDrawer() {
     setEditingBrand(null);
@@ -34,7 +59,7 @@ export function BrandManagement() {
     setDrawerOpen(true);
   }
 
-  function saveBrand(values: Omit<Brand, "id" | "productCount" | "status">) {
+  function saveBrand(values: Omit<Brand, "id" | "productCount">) {
     if (editingBrand) {
       setBrands((current) =>
         current.map((brand) => (brand.id === editingBrand.id ? { ...brand, ...values } : brand)),
@@ -49,7 +74,6 @@ export function BrandManagement() {
         ...values,
         id: `brand-${Date.now()}`,
         productCount: 0,
-        status: "active",
       },
     ]);
     setMessage(`برند «${values.name}» اضافه شد.`);
@@ -58,15 +82,24 @@ export function BrandManagement() {
   const columns = useMemo(
     () =>
       createBrandColumns(
-        (brand) => setMessage(`برند «${brand.name}» انتخاب شد.`),
-        openEditDrawer,
         (brand) => {
-          setBrands((current) => current.filter((item) => item.id !== brand.id));
-          setMessage(`برند «${brand.name}» حذف شد.`);
+          if (isMobile) {
+            setBrandToView(brand);
+            return;
+          }
+          setMessage(`برند «${brand.name}» انتخاب شد.`);
         },
+        openEditDrawer,
+        setBrandToDelete,
       ),
-    [],
+    [isMobile],
   );
+
+  function removeBrand(brand: Brand) {
+    setBrands((current) => current.filter((item) => item.id !== brand.id));
+    setMessage(`برند «${brand.name}» حذف شد.`);
+    setBrandToDelete(null);
+  }
 
   return (
     <div className="w-full min-w-0 space-y-4 p-4 lg:p-6">
@@ -89,23 +122,65 @@ export function BrandManagement() {
         </div>
       ) : null}
 
-      <div className="flex flex-col gap-4 sm:flex-row">
-        <label className="relative min-w-0 flex-1">
+      <div className="flex items-center justify-between gap-3 border-b border-zinc-200 pb-3 md:border-0 md:pb-0">
+        <label className="relative hidden min-w-0 flex-1 md:block">
           <span className="sr-only">جستجوی برند</span>
-          <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-600" size={22} strokeWidth={1.5} />
+          <Image alt="" aria-hidden="true" className="absolute right-4 top-1/2 -translate-y-1/2" height={24} src="/icon/adminDashboard/search.svg" width={24} />
           <Input
-            className="h-[52px] rounded-lg border-zinc-200 bg-white pr-12 shadow-sm"
+            className="h-[52px] rounded-lg border-zinc-200 bg-white pr-12 shadow-none"
             onChange={(event) => setQuery(event.target.value)}
             placeholder="جستجو"
             type="search"
             value={query}
           />
         </label>
-        <Button className="admin-page-action gap-3 px-6 sm:w-36" onClick={openCreateDrawer} type="button">
+
+        <div className="flex items-center gap-2 md:contents">
+          <Button
+            aria-expanded={mobileSearchOpen}
+            aria-label="جستجوی برند"
+            className="size-[52px] rounded-lg border-zinc-200 bg-white text-zinc-500 shadow-none hover:bg-zinc-50 md:hidden"
+            onClick={() => setMobileSearchOpen((current) => !current)}
+            size="icon"
+            type="button"
+            variant="outline"
+          >
+            <Image alt="" aria-hidden="true" height={24} src="/icon/adminDashboard/search.svg" width={24} />
+          </Button>
+          <Button
+            aria-label="فیلتر برندها"
+            className={`h-[52px] w-[52px] rounded-lg border-zinc-200 bg-white shadow-none hover:bg-zinc-50 md:w-32 ${
+              hasActiveFilters ? "border-primary-200 text-primary-500" : "text-zinc-500"
+            }`}
+            onClick={() => setFilterOpen(true)}
+            type="button"
+            variant="outline"
+          >
+            <Image alt="" aria-hidden="true" height={24} src="/icon/adminDashboard/filter.svg" width={24} />
+            <span className="hidden md:inline">فیلتر</span>
+          </Button>
+        </div>
+
+        <Button className="admin-page-action h-[52px]! gap-2 px-4 md:w-40" onClick={openCreateDrawer} type="button">
           <Plus size={21} />
-          افزودن برند
+          برند جدید
         </Button>
       </div>
+
+      {mobileSearchOpen ? (
+        <label className="relative block md:hidden">
+          <span className="sr-only">جستجوی برند</span>
+          <Image alt="" aria-hidden="true" className="absolute right-4 top-1/2 -translate-y-1/2" height={24} src="/icon/adminDashboard/search.svg" width={24} />
+          <Input
+            autoFocus
+            className="h-[52px] rounded-lg border-zinc-200 bg-white pr-12 shadow-none"
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="جستجوی برند..."
+            type="search"
+            value={query}
+          />
+        </label>
+      ) : null}
 
       <DataTable
         ariaLabel="لیست برندها"
@@ -115,6 +190,7 @@ export function BrandManagement() {
         enableRowSelection={false}
         getRowId={(brand) => brand.id}
         pageSize={8}
+        tableClassName="min-w-0 table-fixed md:min-w-[900px] md:table-auto"
       />
 
       <BrandDrawer
@@ -122,6 +198,24 @@ export function BrandManagement() {
         onOpenChange={setDrawerOpen}
         onSave={saveBrand}
         open={drawerOpen}
+      />
+      <BrandDeleteDialog
+        brand={brandToDelete}
+        onCancel={() => setBrandToDelete(null)}
+        onConfirm={removeBrand}
+      />
+      <BrandViewSheet
+        brand={brandToView}
+        isMobile={isMobile}
+        onClose={() => setBrandToView(null)}
+      />
+      <BrandFilterSheet
+        availability={availabilityFilter}
+        onAvailabilityChange={setAvailabilityFilter}
+        onOpenChange={setFilterOpen}
+        onStatusChange={setStatusFilter}
+        open={filterOpen}
+        status={statusFilter}
       />
     </div>
   );

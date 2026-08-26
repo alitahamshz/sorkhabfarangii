@@ -119,7 +119,7 @@ export function ProductList() {
           <span className="sr-only">فیلتر وضعیت</span>
           <Filter className="pointer-events-none absolute right-3 top-1/2 z-10 -translate-y-1/2 text-zinc-500" size={18} />
           <select
-            className="h-12 w-full appearance-none rounded-lg border border-zinc-200 bg-white pr-10 pl-3 text-sm text-zinc-700 outline-none focus:border-primary-500"
+            className="h-12 w-full appearance-none rounded-lg border border-zinc-200 bg-white pr-10 pl-3 text-sm text-zinc-700 outline-none focus:border-zinc-400 focus:ring-3 focus:ring-zinc-200/60"
             onChange={(event) => setStatus(event.target.value as ProductStatus | "all")}
             value={status}
           >
